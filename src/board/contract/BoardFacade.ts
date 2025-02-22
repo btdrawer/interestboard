@@ -9,4 +9,6 @@ export interface BoardFacade {
     subscribe(input: B.SubscribeToBoardInput): FacadeOutput<void>;
 
     unsubscribe(input: B.UnsubscribeFromBoardInput): FacadeOutput<void>;
+
+    get(id: B.BoardId): FacadeOutput<B.Board>;
 }

@@ -1,9 +1,10 @@
+import * as O from "fp-ts/Option";
 import { Repository } from "./Repository";
 import { RepositoryOutput } from "./RepositoryOutput";
 
 export type PaginationOptions<CURSOR> = {
     first: number;
-    cursor?: CURSOR;
+    cursor: O.Option<CURSOR>;
 };
 
 export abstract class PaginatedRepository<ID, CURSOR, T> extends Repository<
