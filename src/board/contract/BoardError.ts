@@ -7,33 +7,43 @@ import {
 
 const boardError = (
     code: FacadeErrorCode,
-    id: O.Option<B.BoardId>,
-    message: O.Option<string>,
+    ids: B.BoardId[],
+    message: string,
 ): BoardError => ({
     code,
     resource: "board",
-    id,
-    message: O.getOrElse(() => "An error occurred.")(message),
+    ids,
+    message,
 });
 
 export const boardBadRequestError = (
-    id: B.BoardId,
-    message: O.Option<string>,
-): BoardError => boardError(FacadeErrorCode.BadRequest, O.some(id), message);
+    ids: B.BoardId[],
+    message: string,
+): BoardError => boardError(FacadeErrorCode.BadRequest, ids, message);
 
 export const boardNotFoundError = (
-    id: B.BoardId,
+    ids: B.BoardId[],
     message: O.Option<string>,
-): BoardError => boardError(FacadeErrorCode.NotFound, O.some(id), message);
+): BoardError =>
+    boardError(
+        FacadeErrorCode.NotFound,
+        ids,
+        O.getOrElse(() => "Board not found.")(message),
+    );
 
 export const boardForbiddenError = (
-    id: B.BoardId,
-    message: O.Option<string>,
-): BoardError => boardError(FacadeErrorCode.Forbidden, O.some(id), message);
+    ids: B.BoardId[],
+    message: string,
+): BoardError => boardError(FacadeErrorCode.Forbidden, ids, message);
 
 export const boardInternalError = (
-    id: O.Option<B.BoardId>,
+    ids: B.BoardId[],
     message: O.Option<string>,
-): BoardError => boardError(FacadeErrorCode.InternalError, id, message);
+): BoardError =>
+    boardError(
+        FacadeErrorCode.InternalError,
+        ids,
+        O.getOrElse(() => "An internal error occurred.")(message),
+    );
 
 export type BoardError = FacadeError<B.BoardId>;

@@ -18,21 +18,21 @@ export const repositoryErrorToBoardError = (
     repositoryError: RepositoryError<B.BoardId>,
 ): BE.BoardError => {
     if (isRepositoryNotFoundError(repositoryError, B.boardId.type)) {
-        return BE.boardNotFoundError(repositoryError.id, O.none);
+        return BE.boardNotFoundError(repositoryError.ids, O.none);
     }
-    return BE.boardInternalError(repositoryError.id, O.none);
+    return BE.boardInternalError(repositoryError.ids, O.none);
 };
 
 const notAModeratorError = (id: B.BoardId) =>
     BE.boardForbiddenError(
-        id,
-        O.some("You cannot update this board because you are not a moderator."),
+        [id],
+        "You cannot update this board because you are not a moderator.",
     );
 
 const noModeratorsLeftError = (id: B.BoardId) =>
     BE.boardBadRequestError(
-        id,
-        O.some("You cannot remove the last moderator from a board."),
+        [id],
+        "You cannot remove the last moderator from a board.",
     );
 
 export class BoardDomain implements BoardFacade {

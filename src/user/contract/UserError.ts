@@ -7,40 +7,47 @@ import {
 
 const userError = (
     code: FacadeErrorCode,
-    id: O.Option<U.UserId>,
+    ids: U.UserId[],
     message: string,
 ): UserError => ({
     code,
     resource: "user",
-    id,
+    ids,
     message,
 });
 
 export const userBadRequestError = (
-    id: O.Option<U.UserId>,
+    ids: U.UserId[],
     message: string,
-): UserError => userError(FacadeErrorCode.BadRequest, id, message);
+): UserError => userError(FacadeErrorCode.BadRequest, ids, message);
 
 export const userNotFoundError = (
-    id: U.UserId,
+    ids: U.UserId[],
     message: O.Option<string>,
 ): UserError =>
     userError(
         FacadeErrorCode.NotFound,
-        O.some(id),
+        ids,
         O.getOrElse(() => "User not found.")(message),
     );
 
-export const usersNotFoundError = (message: string): UserError =>
-    userError(FacadeErrorCode.NotFound, O.none, message);
+export const usersNotFoundError = (
+    ids: U.UserId[],
+    message: O.Option<string>,
+): UserError =>
+    userError(
+        FacadeErrorCode.NotFound,
+        ids,
+        O.getOrElse(() => "Some users in the list were not found.")(message),
+    );
 
 export const userInternalError = (
-    id: O.Option<U.UserId>,
+    ids: U.UserId[],
     message: O.Option<string>,
 ): UserError =>
     userError(
         FacadeErrorCode.InternalError,
-        id,
+        ids,
         O.getOrElse(() => "An internal error occurred.")(message),
     );
 

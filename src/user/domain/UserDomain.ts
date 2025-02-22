@@ -14,15 +14,15 @@ const repositoryErrorToUserError = (
     repositoryError: RE.RepositoryError<U.UserId>,
 ) => {
     if (RE.isRepositoryNotFoundError(repositoryError, U.userId.type)) {
-        return UE.userNotFoundError(repositoryError.id, O.none);
+        return UE.userNotFoundError(repositoryError.ids, O.none);
     }
-    return UE.userInternalError(repositoryError.id, O.none);
+    return UE.userInternalError(repositoryError.ids, O.none);
 };
 
 const noIdsInListError = () =>
-    UE.userBadRequestError(O.none, "No user IDs provided.");
+    UE.userBadRequestError([], "No user IDs provided.");
 
-const missingIds = (ids: U.UserId[]) => UE.usersNotFoundError();
+const missingIdsError = (ids: U.UserId[]) => UE.usersNotFoundError(ids, O.none);
 
 export class UserDomain implements UserFacade {
     constructor(private repository: UserRepository) {}
@@ -61,6 +61,7 @@ export class UserDomain implements UserFacade {
                 const missingIds = nonEmptyIds.filter(
                     (id) => !foundIds.includes(id),
                 );
+                return TE.left(missingIdsError(missingIds));
             }),
         );
     }

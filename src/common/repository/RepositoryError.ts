@@ -19,14 +19,14 @@ export const repositoryErrorCode = t.union([
 export const entityNotFoundErrorDescriptor = <ID>(idType: t.Type<ID>) =>
     t.type({
         code: t.literal(RepositoryErrorCode.EntityNotFound),
-        id: idType,
+        ids: t.array(idType),
         message: t.string,
     });
 
 export const entityNotFoundError = <ID>(id: ID, message?: string) => ({
     code: RepositoryErrorCode.EntityNotFound,
-    id,
-    message: message || `Entity with id ${id} not found`,
+    ids: [id],
+    message: message || "Entity not found.",
 });
 
 export type EntityNotFoundError<ID> = t.TypeOf<
@@ -45,16 +45,13 @@ export const isRepositoryNotFoundError = <ID>(
 export const repositoryInternalErrorDescriptor = <ID>(idType: t.Type<ID>) =>
     t.type({
         code: t.literal(RepositoryErrorCode.InternalError),
-        id: td.optionFromNullable(idType),
+        ids: t.array(idType),
         message: t.string,
     });
 
-export const repositoryInternalError = <ID>(
-    id: O.Option<ID>,
-    message: string,
-) => ({
+export const repositoryInternalError = <ID>(ids: ID[], message: string) => ({
     code: RepositoryErrorCode.InternalError,
-    id,
+    ids,
     message,
 });
 

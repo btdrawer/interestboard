@@ -19,7 +19,7 @@ export const facadeErrorDescriptor = <ID>(idType: t.Type<ID>) =>
     t.type({
         code: facadeErrorCodeDescriptor,
         resource: t.string,
-        id: td.optionFromNullable(idType),
+        ids: t.array(idType),
         message: t.string,
     });
 
