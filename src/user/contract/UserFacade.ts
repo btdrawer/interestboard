@@ -1,9 +1,12 @@
-import * as TE from "fp-ts/TaskEither";
 import * as U from "./User";
-import * as UE from "./UserError";
+import { FacadeOutput } from "../../common/contract/FacadeOutput";
 
 export interface UserFacade {
-    create(username: string): TE.TaskEither<UE.UserError, U.User>;
+    create(username: string): FacadeOutput<U.User>;
 
-    delete(id: U.UserId): TE.TaskEither<UE.UserError, void>;
+    getFromContext(context: U.UserContext): FacadeOutput<U.User>;
+
+    getByIds(ids: U.UserId[]): FacadeOutput<U.User[]>;
+
+    delete(id: U.UserId): FacadeOutput<void>;
 }

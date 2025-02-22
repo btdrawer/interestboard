@@ -1,29 +1,29 @@
-import * as t from "io-ts";
-import * as td from "io-ts-types";
+import * as O from "fp-ts/Option";
+import * as U from "./User";
+import {
+    FacadeError,
+    FacadeErrorCode,
+} from "../../common/contract/FacadeError";
 
-export enum UserErrorCode {
-    UserNotFound = "UserNotFound",
-    InternalError = "InternalError",
-}
-
-export const userErrorCode = t.union([
-    t.literal(UserErrorCode.UserNotFound),
-    t.literal(UserErrorCode.InternalError),
-]);
-
-export const userNotFoundError = t.type({
-    type: t.literal(UserErrorCode.UserNotFound),
-    userId: td.UUID,
-    message: t.string,
+const userError = (
+    code: FacadeErrorCode,
+    id: O.Option<U.UserId>,
+    message: O.Option<string>,
+): UserError => ({
+    code,
+    resource: "user",
+    id,
+    message: O.getOrElse(() => "An error occurred.")(message),
 });
 
-export const userInternalError = t.type({
-    type: t.literal(UserErrorCode.InternalError),
-    message: t.string,
-});
+export const userNotFoundError = (
+    id: U.UserId,
+    message: O.Option<string>,
+): UserError => userError(FacadeErrorCode.NotFound, O.some(id), message);
 
-export const userError = t.union([userNotFoundError, userInternalError]);
+export const userInternalError = (
+    id: O.Option<U.UserId>,
+    message: O.Option<string>,
+): UserError => userError(FacadeErrorCode.InternalError, id, message);
 
-export type UserNotFoundError = t.TypeOf<typeof userNotFoundError>;
-export type UserInternalError = t.TypeOf<typeof userInternalError>;
-export type UserError = t.TypeOf<typeof userError>;
+export type UserError = FacadeError<U.UserId>;

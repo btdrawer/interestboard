@@ -12,3 +12,9 @@ export const user = t.type({
 export type UserId = t.TypeOf<typeof userId>;
 export type UserCursor = t.TypeOf<typeof userCursor>;
 export type User = t.TypeOf<typeof user>;
+
+export const userContext = t.type({
+    userId: userId,
+});
+
+export type UserContext = t.TypeOf<typeof userContext>;

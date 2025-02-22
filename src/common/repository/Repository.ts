@@ -1,10 +1,9 @@
-import * as TE from "fp-ts/TaskEither";
-import * as RE from "./RepositoryError";
+import { RepositoryOutput } from "./RepositoryOutput";
 
 export interface Repository<ID, T> {
-    save(entity: T): TE.TaskEither<RE.RepositoryError<ID>, T>;
+    save(entity: T): RepositoryOutput<ID, T>;
 
-    find(id: ID): TE.TaskEither<RE.RepositoryError<ID>, T>;
+    find(id: ID): RepositoryOutput<ID, T>;
 
-    delete(id: ID): TE.TaskEither<RE.RepositoryError<ID>, void>;
+    delete(id: ID): RepositoryOutput<ID, void>;
 }
