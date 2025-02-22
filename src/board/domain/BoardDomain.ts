@@ -52,6 +52,7 @@ export class BoardDomain implements BoardFacade {
                 description: input.description,
                 moderators: [user.id] as NonEmptyArray<U.UserId>,
                 subscribers: 1,
+                locked: false,
             })),
             TE.chain((board) =>
                 this.callRepository(this.repository.save(board)),
@@ -76,6 +77,7 @@ export class BoardDomain implements BoardFacade {
                     ),
                     ...input.moderators.add,
                 ] as NonEmptyArray<U.UserId>, // TODO better validation
+                locked: input.locked,
             })),
             TE.chain((updatedBoard) =>
                 this.callRepository(this.repository.save(updatedBoard)),
@@ -114,15 +116,29 @@ export class BoardDomain implements BoardFacade {
     }
 
     subscribe(input: B.SubscribeToBoardInput): FacadeOutput<void> {
-        throw new Error("Method not implemented.");
+        return pipe(
+            TE.Do,
+            TE.chain(() => this.userFacade.getFromContext(input.context)),
+            TE.chain(() => this.callRepository(this.repository.find(input.id))),
+            TE.chain(() =>
+                this.callRepository(
+                    this.repository.subscribe(input.id, input.context.userId),
+                ),
+            ),
+        );
     }
 
     unsubscribe(input: B.UnsubscribeFromBoardInput): FacadeOutput<void> {
-        throw new Error("Method not implemented.");
-    }
-
-    lock(input: B.LockBoardInput): FacadeOutput<void> {
-        throw new Error("Method not implemented.");
+        return pipe(
+            TE.Do,
+            TE.chain(() => this.userFacade.getFromContext(input.context)),
+            TE.chain(() => this.callRepository(this.repository.find(input.id))),
+            TE.chain(() =>
+                this.callRepository(
+                    this.repository.unsubscribe(input.id, input.context.userId),
+                ),
+            ),
+        );
     }
 
     private callRepository<T>(

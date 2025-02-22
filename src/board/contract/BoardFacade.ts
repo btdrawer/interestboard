@@ -11,6 +11,4 @@ export interface BoardFacade {
     subscribe(input: B.SubscribeToBoardInput): FacadeOutput<void>;
 
     unsubscribe(input: B.UnsubscribeFromBoardInput): FacadeOutput<void>;
-
-    lock(input: B.LockBoardInput): FacadeOutput<void>;
 }

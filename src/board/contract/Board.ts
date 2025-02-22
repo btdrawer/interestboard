@@ -13,6 +13,7 @@ export const board = t.type({
     description: td.optionFromNullable(t.string),
     moderators: td.nonEmptyArray(userId),
     subscribers: t.number,
+    locked: t.boolean,
 });
 
 export type BoardId = t.TypeOf<typeof boardId>;
@@ -44,6 +45,7 @@ export const updateBoardInput = t.type({
     title: t.string,
     description: td.optionFromNullable(t.string),
     moderators: updateModeratorsInput,
+    locked: t.boolean,
 });
 
 export type UpdateBoardInput = t.TypeOf<typeof updateBoardInput>;
