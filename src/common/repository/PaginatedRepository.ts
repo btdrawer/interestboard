@@ -1,3 +1,4 @@
+import { Repository } from "./Repository";
 import { RepositoryOutput } from "./RepositoryOutput";
 
 export type PaginationOptions<CURSOR> = {
@@ -5,6 +6,11 @@ export type PaginationOptions<CURSOR> = {
     cursor?: CURSOR;
 };
 
-export interface PaginatedRepository<ID, CURSOR, T> {
-    list(options: PaginationOptions<CURSOR>): RepositoryOutput<ID, T[]>;
+export abstract class PaginatedRepository<ID, CURSOR, T> extends Repository<
+    ID,
+    T
+> {
+    abstract list(
+        options: PaginationOptions<CURSOR>,
+    ): RepositoryOutput<ID, T[]>;
 }

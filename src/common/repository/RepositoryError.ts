@@ -5,14 +5,40 @@ import * as O from "fp-ts/Option";
 /** RepositoryErrorCode */
 
 export enum RepositoryErrorCode {
+    BadRequest = "BadRequest",
     EntityNotFound = "EntityNotFound",
     InternalError = "InternalError",
 }
 
 export const repositoryErrorCode = t.union([
+    t.literal(RepositoryErrorCode.BadRequest),
     t.literal(RepositoryErrorCode.EntityNotFound),
     t.literal(RepositoryErrorCode.InternalError),
 ]);
+
+/** BadRequest */
+
+export const badRequestErrorDescriptor = <ID>(idType: t.Type<ID>) =>
+    t.type({
+        code: t.literal(RepositoryErrorCode.BadRequest),
+        ids: t.array(idType),
+        message: t.string,
+    });
+
+export const badRequestError = <ID>(ids: ID[], message: string) => ({
+    code: RepositoryErrorCode.BadRequest,
+    ids,
+    message,
+});
+
+export type BadRequestError<ID> = t.TypeOf<
+    ReturnType<typeof badRequestErrorDescriptor<ID>>
+>;
+
+export const isBadRequestError = <ID>(
+    error: unknown,
+    idType: t.Type<ID>,
+): error is BadRequestError<ID> => badRequestErrorDescriptor(idType).is(error);
 
 /** EntityNotFound */
 
@@ -36,9 +62,8 @@ export type EntityNotFoundError<ID> = t.TypeOf<
 export const isRepositoryNotFoundError = <ID>(
     error: unknown,
     idType: t.Type<ID>,
-): error is EntityNotFoundError<ID> => {
-    return entityNotFoundErrorDescriptor(idType).is(error);
-};
+): error is EntityNotFoundError<ID> =>
+    entityNotFoundErrorDescriptor(idType).is(error);
 
 /** InternalError */
 
@@ -62,14 +87,14 @@ export type RepositoryInternalError<ID> = t.TypeOf<
 export const isRepositoryInternalError = <ID>(
     error: unknown,
     idType: t.Type<ID>,
-): error is RepositoryInternalError<ID> => {
-    return repositoryInternalErrorDescriptor(idType).is(error);
-};
+): error is RepositoryInternalError<ID> =>
+    repositoryInternalErrorDescriptor(idType).is(error);
 
 /** RepositoryError */
 
 export const repositoryError = <ID>(idType: t.Type<ID>) =>
     t.union([
+        badRequestErrorDescriptor(idType),
         entityNotFoundErrorDescriptor(idType),
         repositoryInternalErrorDescriptor(idType),
     ]);

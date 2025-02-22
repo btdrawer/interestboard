@@ -1,13 +1,19 @@
+import * as t from "io-ts";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { Repository } from "../../Repository";
 import * as RE from "../../RepositoryError";
 
-export class FakeRepository<ID, T> implements Repository<ID, T> {
+export class FakeRepository<ID, T> extends Repository<ID, T> {
     protected entities: Map<ID, T> = new Map();
 
-    constructor(protected getId: (entity: T) => ID) {}
+    constructor(
+        protected idType: t.Type<ID>,
+        protected getId: (entity: T) => ID,
+    ) {
+        super(idType);
+    }
 
     save(entity: T): TE.TaskEither<RE.RepositoryError<ID>, T> {
         return pipe(
