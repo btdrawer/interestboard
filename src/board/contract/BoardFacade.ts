@@ -1,7 +1,5 @@
-import * as TE from "fp-ts/TaskEither";
 import { FacadeOutput } from "../../common/contract/FacadeOutput";
 import * as B from "./Board";
-import * as BE from "./BoardError";
 
 export interface BoardFacade {
     create(input: B.CreateBoardInput): FacadeOutput<B.Board>;

@@ -14,6 +14,8 @@ export const board = t.type({
     moderators: td.nonEmptyArray(userId),
     subscribers: t.number,
     locked: t.boolean,
+    created: td.DateFromISOString,
+    updated: td.DateFromISOString,
 });
 
 export type BoardId = t.TypeOf<typeof boardId>;

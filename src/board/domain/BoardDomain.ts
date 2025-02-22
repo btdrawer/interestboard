@@ -45,15 +45,20 @@ export class BoardDomain implements BoardFacade {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.map((user) => ({
-                id: B.generateBoardId(),
-                name: input.name,
-                title: input.title,
-                description: input.description,
-                moderators: [user.id] as NonEmptyArray<U.UserId>,
-                subscribers: 1,
-                locked: false,
-            })),
+            TE.map((user) => {
+                const timestamp = new Date();
+                return {
+                    id: B.generateBoardId(),
+                    name: input.name,
+                    title: input.title,
+                    description: input.description,
+                    moderators: [user.id] as NonEmptyArray<U.UserId>,
+                    subscribers: 1,
+                    locked: false,
+                    created: timestamp,
+                    updated: timestamp,
+                };
+            }),
             TE.chain((board) =>
                 this.callRepository(this.repository.save(board)),
             ),
@@ -78,6 +83,7 @@ export class BoardDomain implements BoardFacade {
                     ...input.moderators.add,
                 ] as NonEmptyArray<U.UserId>, // TODO better validation
                 locked: input.locked,
+                updated: new Date(),
             })),
             TE.chain((updatedBoard) =>
                 this.callRepository(this.repository.save(updatedBoard)),

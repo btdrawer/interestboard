@@ -8,22 +8,40 @@ import {
 const userError = (
     code: FacadeErrorCode,
     id: O.Option<U.UserId>,
-    message: O.Option<string>,
+    message: string,
 ): UserError => ({
     code,
     resource: "user",
     id,
-    message: O.getOrElse(() => "An error occurred.")(message),
+    message,
 });
+
+export const userBadRequestError = (
+    id: O.Option<U.UserId>,
+    message: string,
+): UserError => userError(FacadeErrorCode.BadRequest, id, message);
 
 export const userNotFoundError = (
     id: U.UserId,
     message: O.Option<string>,
-): UserError => userError(FacadeErrorCode.NotFound, O.some(id), message);
+): UserError =>
+    userError(
+        FacadeErrorCode.NotFound,
+        O.some(id),
+        O.getOrElse(() => "User not found.")(message),
+    );
+
+export const usersNotFoundError = (message: string): UserError =>
+    userError(FacadeErrorCode.NotFound, O.none, message);
 
 export const userInternalError = (
     id: O.Option<U.UserId>,
     message: O.Option<string>,
-): UserError => userError(FacadeErrorCode.InternalError, id, message);
+): UserError =>
+    userError(
+        FacadeErrorCode.InternalError,
+        id,
+        O.getOrElse(() => "An internal error occurred.")(message),
+    );
 
 export type UserError = FacadeError<U.UserId>;
