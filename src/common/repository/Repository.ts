@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
+import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
 import { RepositoryOutput } from "./RepositoryOutput";
 import { isRepositoryNotFoundError } from "./RepositoryError";
@@ -27,3 +28,10 @@ export abstract class Repository<ID, T> {
 
     abstract delete(id: ID): RepositoryOutput<ID, void>;
 }
+
+export const generateCursor =
+    <T>(extractFields: (entity: T) => NEA.NonEmptyArray<string>) =>
+    (entity: T): string =>
+        Buffer.from(extractFields(entity).join(":"), "utf-8").toString(
+            "base64",
+        );
