@@ -1,4 +1,5 @@
-import { Repository } from "../../common/repository/Repository";
+import * as NEA from "fp-ts/NonEmptyArray";
+import { generateCursor, Repository } from "../../common/repository/Repository";
 import {
     PaginatedRepository,
     PaginationOptions,
@@ -20,3 +21,13 @@ export type CommentRepository = Repository<C.CommentId, C.Comment> &
             pagination: PaginationOptions<C.CommentCursor>,
         ) => RepositoryOutput<C.CommentId, C.Comment[]>;
     };
+
+export const getId = (comment: C.Comment): C.CommentId => comment.id;
+
+export const getCursor = generateCursor<C.Comment>(
+    (comment) =>
+        [
+            comment.id.toString(),
+            comment.updated.toISOString(),
+        ] as NEA.NonEmptyArray<string>,
+);

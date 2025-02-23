@@ -24,19 +24,30 @@ export class FakePaginatedRepository<ID, CURSOR, T>
     list(
         options: PaginationOptions<CURSOR>,
     ): TE.TaskEither<RE.RepositoryError<ID>, T[]> {
-        return pipe(
-            TE.Do,
-            TE.map(() => Array.from(this.entities.values())),
-            TE.map((entities) => {
-                const entitiesAfterCursor = O.fold<CURSOR, T[]>(
-                    () => entities,
-                    (cursor) =>
-                        entities.filter(
-                            (entity) => this.getCursor(entity) > cursor,
-                        ),
-                )(options.cursor);
-                return entitiesAfterCursor.slice(0, options.first);
-            }),
-        );
+        return this.listWithFilter(() => true)(options);
+    }
+
+    protected listWithFilter(predicate: (entity: T) => boolean) {
+        return (options: PaginationOptions<CURSOR>) =>
+            pipe(
+                TE.Do,
+                TE.map(() =>
+                    Array.from(this.entities.values()).filter(predicate),
+                ),
+                TE.map(this.applyPaginationToList(options)),
+            );
+    }
+
+    private applyPaginationToList(options: PaginationOptions<CURSOR>) {
+        return (entities: T[]) => {
+            const entitiesAfterCursor = O.fold<CURSOR, T[]>(
+                () => entities,
+                (cursor) =>
+                    entities.filter(
+                        (entity) => this.getCursor(entity) > cursor,
+                    ),
+            )(options.cursor);
+            return entitiesAfterCursor.slice(0, options.first);
+        };
     }
 }
