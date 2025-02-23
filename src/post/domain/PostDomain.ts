@@ -44,6 +44,7 @@ export class PostDomain implements PostFacade {
                     body: input.body,
                     upvotes: 0,
                     downvotes: 0,
+                    userVote: O.none,
                     comments: 0,
                     created: timestamp,
                     updated: timestamp,

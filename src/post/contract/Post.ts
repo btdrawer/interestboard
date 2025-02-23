@@ -7,6 +7,16 @@ import { boardId } from "../../board/contract/Board";
 export const postId = td.UUID;
 export const postCursor = t.string;
 
+export enum VoteType {
+    Upvote = "Upvote",
+    Downvote = "Downvote",
+}
+
+export const voteType = t.union([
+    t.literal(VoteType.Upvote),
+    t.literal(VoteType.Downvote),
+]);
+
 export const post = t.type({
     id: postId,
     authorId: userId,
@@ -15,6 +25,7 @@ export const post = t.type({
     body: t.string,
     upvotes: t.number,
     downvotes: t.number,
+    userVote: td.optionFromNullable(voteType),
     comments: t.number,
     created: td.DateFromISOString,
     updated: td.DateFromISOString,
@@ -37,16 +48,6 @@ export const createPostInput = t.type({
 });
 
 export type CreatePostInput = t.TypeOf<typeof createPostInput>;
-
-export enum VoteType {
-    Upvote = "Upvote",
-    Downvote = "Downvote",
-}
-
-export const voteType = t.union([
-    t.literal(VoteType.Upvote),
-    t.literal(VoteType.Downvote),
-]);
 
 export const voteInput = t.type({
     context: userContext,
