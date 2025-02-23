@@ -1,5 +1,5 @@
-import * as P from "./Post";
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
+import * as P from "../types/Post";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
 
 export interface PostFacade {
     create(input: P.CreatePostInput): FacadeOutput<P.Post>;

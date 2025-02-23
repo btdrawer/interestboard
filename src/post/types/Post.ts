@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import * as td from "io-ts-types";
 import { v4 as uuidv4 } from "uuid";
-import { userContext, userId } from "../../user/contract/User";
-import { boardId } from "../../board/contract/Board";
+import { userContext, userId } from "../../user/types/User";
+import { boardId } from "../../board/types/Board";
 
 export const postId = td.UUID;
 export const postCursor = t.string;

@@ -1,5 +1,5 @@
-import * as U from "./User";
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
+import * as U from "../types/User";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
 
 export interface UserFacade {
     create(input: U.CreateUserInput): FacadeOutput<U.User>;

@@ -1,5 +1,5 @@
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
-import * as B from "./Board";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
+import * as B from "../types/Board";
 
 export interface BoardFacade {
     create(input: B.CreateBoardInput): FacadeOutput<B.Board>;

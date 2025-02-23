@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-import * as td from "io-ts-types";
 
 export const facadeErrorCodeDescriptor = t.union([
     t.literal("BadRequest"),

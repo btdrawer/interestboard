@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import * as td from "io-ts-types";
 import { v4 as uuidv4 } from "uuid";
-import { userContext, userId } from "../../user/contract/User";
+import { userContext, userId } from "../../user/types/User";
 
 export const boardId = td.UUID;
 export const boardCursor = t.string;
