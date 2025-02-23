@@ -49,6 +49,12 @@ export const createPostInput = t.type({
 
 export type CreatePostInput = t.TypeOf<typeof createPostInput>;
 
+export const getPostInput = t.type({
+    id: postId,
+});
+
+export type GetPostInput = t.TypeOf<typeof getPostInput>;
+
 export const voteInput = t.type({
     context: userContext,
     id: postId,

@@ -55,6 +55,10 @@ export class PostDomain implements PostFacade {
         );
     }
 
+    get(input: P.GetPostInput): FacadeOutput<P.Post> {
+        return this.callRepository(this.repository.find(input.id));
+    }
+
     // TODO cannot remove vote, also if changing vote, both upvotes and downvotes should be updated
     vote(input: P.VoteInput): FacadeOutput<void> {
         return pipe(

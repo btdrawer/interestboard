@@ -11,6 +11,7 @@ export const comment = t.type({
     id: commentId,
     authorId: userId,
     postId,
+    parentId: td.optionFromNullable(commentId),
     body: t.string,
     upvotes: t.number,
     downvotes: t.number,
@@ -30,6 +31,7 @@ export const generateCommentId = (): CommentId => uuidv4() as CommentId;
 export const createCommentInput = t.type({
     context: userContext,
     postId,
+    parentId: td.optionFromNullable(commentId),
     body: t.string,
 });
 
@@ -50,3 +52,10 @@ export const listCommentsByUser = t.type({
 });
 
 export type ListCommentsByUser = t.TypeOf<typeof listCommentsByUser>;
+
+export const deleteCommentInput = t.type({
+    context: userContext,
+    id: commentId,
+});
+
+export type DeleteCommentInput = t.TypeOf<typeof deleteCommentInput>;
