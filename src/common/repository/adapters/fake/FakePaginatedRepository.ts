@@ -34,7 +34,7 @@ export class FakePaginatedRepository<ID, CURSOR, T>
                         entities.filter(
                             (entity) => this.getCursor(entity) > cursor,
                         ),
-                )(O.fromNullable(options.cursor));
+                )(options.cursor);
                 return entitiesAfterCursor.slice(0, options.first);
             }),
         );

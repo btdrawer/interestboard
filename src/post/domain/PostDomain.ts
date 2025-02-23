@@ -1,13 +1,13 @@
 import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
-import * as P from "../contract/Post";
-import * as PE from "../contract/PostError";
-import { PostFacade } from "../contract/PostFacade";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
+import * as P from "../types/Post";
+import * as PE from "../types/PostError";
+import { PostFacade } from "../facade/PostFacade";
 import { PostRepository } from "../repository/PostRepository";
-import { UserFacade } from "../../user/contract/UserFacade";
-import { BoardFacade } from "../../board/contract/BoardFacade";
+import { UserFacade } from "../../user/facade/UserFacade";
+import { BoardFacade } from "../../board/facade/BoardFacade";
 import * as RE from "../../common/repository/RepositoryError";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 

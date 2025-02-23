@@ -1,7 +1,7 @@
 import { Repository } from "../../common/repository/Repository";
 import { PaginatedRepository } from "../../common/repository/PaginatedRepository";
-import * as B from "../contract/Board";
-import * as U from "../../user/contract/User";
+import * as B from "../types/Board";
+import * as U from "../../user/types/User";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type BoardRepository = Repository<B.BoardId, B.Board> &

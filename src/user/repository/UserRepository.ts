@@ -1,7 +1,7 @@
 import * as NEA from "fp-ts/NonEmptyArray";
 import { Repository } from "../../common/repository/Repository";
 import { PaginatedRepository } from "../../common/repository/PaginatedRepository";
-import * as U from "../contract/User";
+import * as U from "../types/User";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type UserRepository = Repository<U.UserId, U.User> &

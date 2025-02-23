@@ -1,9 +1,6 @@
 import * as O from "fp-ts/Option";
 import * as U from "./User";
-import {
-    FacadeError,
-    FacadeErrorCode,
-} from "../../common/contract/FacadeError";
+import { FacadeError, FacadeErrorCode } from "../../common/facade/FacadeError";
 
 const userError = (
     code: FacadeErrorCode,

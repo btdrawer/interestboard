@@ -1,7 +1,7 @@
 import * as O from "fp-ts/Option";
-import * as P from "../contract/Post";
-import * as B from "../../board/contract/Board";
-import * as U from "../../user/contract/User";
+import * as P from "../types/Post";
+import * as B from "../../board/types/Board";
+import * as U from "../../user/types/User";
 import { Repository } from "../../common/repository/Repository";
 import {
     PaginatedRepository,

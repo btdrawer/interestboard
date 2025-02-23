@@ -2,12 +2,12 @@ import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
 import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
-import * as U from "../contract/User";
-import * as UE from "../contract/UserError";
-import { UserFacade } from "../contract/UserFacade";
+import * as U from "../types/User";
+import * as UE from "../types/UserError";
+import { UserFacade } from "../facade/UserFacade";
 import { UserRepository } from "../repository/UserRepository";
 import * as RE from "../../common/repository/RepositoryError";
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 const repositoryErrorToUserError = (

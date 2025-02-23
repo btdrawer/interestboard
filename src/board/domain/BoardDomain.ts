@@ -1,13 +1,13 @@
 import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import * as U from "../../user/contract/User";
-import * as B from "../contract/Board";
-import * as BE from "../contract/BoardError";
-import { BoardFacade } from "../contract/BoardFacade";
-import { UserFacade } from "../../user/contract/UserFacade";
+import * as U from "../../user/types/User";
+import * as B from "../types/Board";
+import * as BE from "../types/BoardError";
+import { BoardFacade } from "../facade/BoardFacade";
+import { UserFacade } from "../../user/facade/UserFacade";
 import { BoardRepository } from "../repository/BoardRepository";
-import { FacadeOutput } from "../../common/contract/FacadeOutput";
+import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import {
     isRepositoryNotFoundError,
     RepositoryError,
@@ -63,6 +63,10 @@ export class BoardDomain implements BoardFacade {
                 this.callRepository(this.repository.save(board)),
             ),
         );
+    }
+
+    get(id: B.BoardId): FacadeOutput<B.Board> {
+        return this.callRepository(this.repository.find(id));
     }
 
     update(input: B.UpdateBoardInput): FacadeOutput<B.Board> {

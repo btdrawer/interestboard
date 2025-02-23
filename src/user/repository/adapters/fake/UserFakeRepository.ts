@@ -1,7 +1,7 @@
 import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import * as U from "../../../contract/User";
+import * as U from "../../../types/User";
 import { FakePaginatedRepository } from "../../../../common/repository/adapters/fake/FakePaginatedRepository";
 import { UserRepository } from "../../UserRepository";
 import { NonEmptyArray } from "fp-ts/lib/NonEmptyArray";

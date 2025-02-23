@@ -1,6 +1,4 @@
 import * as t from "io-ts";
-import * as td from "io-ts-types";
-import * as O from "fp-ts/Option";
 
 /** RepositoryErrorCode */
 
