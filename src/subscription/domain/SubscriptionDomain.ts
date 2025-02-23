@@ -61,7 +61,6 @@ export class SubscriptionDomain implements SubscriptionFacade {
         );
     }
 
-    // TODO can we use a transaction here?
     subscribe(
         input: SI.SubscribeToBoardInput,
     ): FacadeOutput<S.BoardSubscription> {
@@ -83,6 +82,8 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     }),
                 ),
             ),
+            // So the number of subscribers can be easily displayed. Fine being eventually consistent?
+            // TODO Maybe make this transactional (turn subscribers into an aggregate?)
             TE.bind("boardUpdate", () =>
                 this.boardFacade.addSubscriber(input.id),
             ),
