@@ -126,30 +126,12 @@ export class BoardDomain implements BoardFacade {
         );
     }
 
-    subscribe(input: BI.SubscribeToBoardInput): FacadeOutput<void> {
-        return pipe(
-            TE.Do,
-            TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.chain(() => this.callRepository(this.repository.find(input.id))),
-            TE.chain(() =>
-                this.callRepository(
-                    this.repository.subscribe(input.id, input.context.userId),
-                ),
-            ),
-        );
+    addSubscriber(id: B.BoardId): FacadeOutput<B.Board> {
+        return this.callRepository(this.repository.addSubscriber(id));
     }
 
-    unsubscribe(input: BI.UnsubscribeFromBoardInput): FacadeOutput<void> {
-        return pipe(
-            TE.Do,
-            TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.chain(() => this.callRepository(this.repository.find(input.id))),
-            TE.chain(() =>
-                this.callRepository(
-                    this.repository.unsubscribe(input.id, input.context.userId),
-                ),
-            ),
-        );
+    removeSubscriber(id: B.BoardId): FacadeOutput<B.Board> {
+        return this.callRepository(this.repository.removeSubscriber(id));
     }
 
     private callRepository<T>(

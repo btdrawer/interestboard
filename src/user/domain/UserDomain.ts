@@ -41,6 +41,10 @@ export class UserDomain implements UserFacade {
         return this.callRepository(this.repository.saveNewUser(user));
     }
 
+    get(id: U.UserId): FacadeOutput<U.User> {
+        return this.callRepository(this.repository.find(id));
+    }
+
     getFromContext(context: U.UserContext): FacadeOutput<U.User> {
         return this.callRepository(this.repository.find(context.userId));
     }
