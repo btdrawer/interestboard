@@ -25,37 +25,3 @@ export type CommentCursor = t.TypeOf<typeof commentCursor>;
 export type Comment = t.TypeOf<typeof comment>;
 
 export const generateCommentId = (): CommentId => uuidv4() as CommentId;
-
-/** Input */
-
-export const createCommentInput = t.type({
-    context: userContext,
-    postId,
-    parentId: td.optionFromNullable(commentId),
-    body: t.string,
-});
-
-export type CreateCommentInput = t.TypeOf<typeof createCommentInput>;
-
-export const listCommentsByPost = t.type({
-    postId,
-    first: t.number,
-    cursor: td.optionFromNullable(commentCursor),
-});
-
-export type ListCommentsByPost = t.TypeOf<typeof listCommentsByPost>;
-
-export const listCommentsByUser = t.type({
-    userId,
-    first: t.number,
-    cursor: td.optionFromNullable(commentCursor),
-});
-
-export type ListCommentsByUser = t.TypeOf<typeof listCommentsByUser>;
-
-export const deleteCommentInput = t.type({
-    context: userContext,
-    id: commentId,
-});
-
-export type DeleteCommentInput = t.TypeOf<typeof deleteCommentInput>;

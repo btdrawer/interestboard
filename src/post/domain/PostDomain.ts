@@ -3,6 +3,7 @@ import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import * as P from "../types/Post";
+import * as PI from "../types/PostInput";
 import * as PE from "../types/PostError";
 import { PostFacade } from "../facade/PostFacade";
 import { PostRepository } from "../repository/PostRepository";
@@ -27,7 +28,7 @@ export class PostDomain implements PostFacade {
         private boardFacade: BoardFacade,
     ) {}
 
-    create(input: P.CreatePostInput): FacadeOutput<P.Post> {
+    create(input: PI.CreatePostInput): FacadeOutput<P.Post> {
         return pipe(
             TE.Do,
             TE.bind("user", () =>
@@ -55,12 +56,12 @@ export class PostDomain implements PostFacade {
         );
     }
 
-    get(input: P.GetPostInput): FacadeOutput<P.Post> {
+    get(input: PI.GetPostInput): FacadeOutput<P.Post> {
         return this.callRepository(this.repository.find(input.id));
     }
 
     // TODO cannot remove vote, also if changing vote, both upvotes and downvotes should be updated
-    vote(input: P.VoteInput): FacadeOutput<void> {
+    vote(input: PI.VoteInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.bind("user", () =>
@@ -77,7 +78,7 @@ export class PostDomain implements PostFacade {
         );
     }
 
-    listByBoard(input: P.ListPostsByBoardInput): FacadeOutput<P.Post[]> {
+    listByBoard(input: PI.ListPostsByBoardInput): FacadeOutput<P.Post[]> {
         return this.callRepository(
             this.repository.findByBoardId(input.boardId, {
                 first: input.first,
@@ -86,7 +87,7 @@ export class PostDomain implements PostFacade {
         );
     }
 
-    listByUser(input: P.ListPostsByUserInput): FacadeOutput<P.Post[]> {
+    listByUser(input: PI.ListPostsByUserInput): FacadeOutput<P.Post[]> {
         return this.callRepository(
             this.repository.findByUserId(input.userId, {
                 first: input.first,
@@ -96,7 +97,7 @@ export class PostDomain implements PostFacade {
     }
 
     // TODO allow moderators to delete posts
-    delete(input: P.DeletePostInput): FacadeOutput<void> {
+    delete(input: PI.DeletePostInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.bind("user", () =>

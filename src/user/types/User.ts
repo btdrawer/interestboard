@@ -27,13 +27,3 @@ export const userContext = t.type({
 });
 
 export type UserContext = t.TypeOf<typeof userContext>;
-
-/** Inputs */
-
-export const createUserInput = t.type({
-    username: t.string,
-    name: t.string,
-    email: t.string,
-});
-
-export type CreateUserInput = t.TypeOf<typeof createUserInput>;

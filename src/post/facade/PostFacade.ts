@@ -1,16 +1,17 @@
 import * as P from "../types/Post";
+import * as PI from "../types/PostInput";
 import { FacadeOutput } from "../../common/facade/FacadeOutput";
 
 export interface PostFacade {
-    create(input: P.CreatePostInput): FacadeOutput<P.Post>;
+    create(input: PI.CreatePostInput): FacadeOutput<P.Post>;
 
-    get(input: P.GetPostInput): FacadeOutput<P.Post>;
+    get(input: PI.GetPostInput): FacadeOutput<P.Post>;
 
-    vote(input: P.VoteInput): FacadeOutput<void>;
+    vote(input: PI.VoteInput): FacadeOutput<void>;
 
-    listByBoard(input: P.ListPostsByBoardInput): FacadeOutput<P.Post[]>;
+    listByBoard(input: PI.ListPostsByBoardInput): FacadeOutput<P.Post[]>;
 
-    listByUser(input: P.ListPostsByUserInput): FacadeOutput<P.Post[]>;
+    listByUser(input: PI.ListPostsByUserInput): FacadeOutput<P.Post[]>;
 
-    delete(context: P.DeletePostInput): FacadeOutput<void>;
+    delete(context: PI.DeletePostInput): FacadeOutput<void>;
 }

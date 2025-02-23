@@ -5,6 +5,7 @@ import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import { CommentFacade } from "../facade/CommentFacade";
 import { CommentRepository } from "../repository/CommentRepository";
 import * as C from "../types/Comment";
+import * as CI from "../types/CommentInput";
 import * as P from "../../post/types/Post";
 import * as CE from "../types/CommentError";
 import * as RE from "../../common/repository/RepositoryError";
@@ -42,7 +43,7 @@ export class CommentDomain implements CommentFacade {
     ) {}
 
     // TODO validate that postId and parentId are compatible
-    create(input: C.CreateCommentInput): FacadeOutput<C.Comment> {
+    create(input: CI.CreateCommentInput): FacadeOutput<C.Comment> {
         return pipe(
             TE.Do,
             TE.bind("user", () =>
@@ -90,7 +91,7 @@ export class CommentDomain implements CommentFacade {
         )(id);
     }
 
-    listByPost(input: C.ListCommentsByPost): FacadeOutput<C.Comment[]> {
+    listByPost(input: CI.ListCommentsByPost): FacadeOutput<C.Comment[]> {
         return this.callRepository(
             this.repository.listByPostId(input.postId, {
                 first: input.first,
@@ -99,7 +100,7 @@ export class CommentDomain implements CommentFacade {
         );
     }
 
-    listByUser(input: C.ListCommentsByUser): FacadeOutput<C.Comment[]> {
+    listByUser(input: CI.ListCommentsByUser): FacadeOutput<C.Comment[]> {
         return this.callRepository(
             this.repository.listByUserId(input.userId, {
                 first: input.first,
@@ -109,7 +110,7 @@ export class CommentDomain implements CommentFacade {
     }
 
     // TODO allow moderators to delete comments
-    delete(input: C.DeleteCommentInput): FacadeOutput<void> {
+    delete(input: CI.DeleteCommentInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.bind("user", () =>

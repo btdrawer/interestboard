@@ -3,6 +3,7 @@ import * as O from "fp-ts/Option";
 import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
 import * as U from "../types/User";
+import * as UI from "../types/UserInput";
 import * as UE from "../types/UserError";
 import { UserFacade } from "../facade/UserFacade";
 import { UserRepository } from "../repository/UserRepository";
@@ -27,7 +28,7 @@ const missingIdsError = (ids: U.UserId[]) => UE.usersNotFoundError(ids, O.none);
 export class UserDomain implements UserFacade {
     constructor(private repository: UserRepository) {}
 
-    create(input: U.CreateUserInput): TE.TaskEither<UE.UserError, U.User> {
+    create(input: UI.CreateUserInput): TE.TaskEither<UE.UserError, U.User> {
         const timestamp = new Date();
         const user: U.User = {
             id: U.generateUserId(),

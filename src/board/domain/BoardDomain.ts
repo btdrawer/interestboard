@@ -3,6 +3,7 @@ import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import * as U from "../../user/types/User";
 import * as B from "../types/Board";
+import * as BI from "../types/BoardInput";
 import * as BE from "../types/BoardError";
 import { BoardFacade } from "../facade/BoardFacade";
 import { UserFacade } from "../../user/facade/UserFacade";
@@ -41,7 +42,7 @@ export class BoardDomain implements BoardFacade {
         private userFacade: UserFacade,
     ) {}
 
-    create(input: B.CreateBoardInput): FacadeOutput<B.Board> {
+    create(input: BI.CreateBoardInput): FacadeOutput<B.Board> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
@@ -69,7 +70,7 @@ export class BoardDomain implements BoardFacade {
         return this.callRepository(this.repository.find(id));
     }
 
-    update(input: B.UpdateBoardInput): FacadeOutput<B.Board> {
+    update(input: BI.UpdateBoardInput): FacadeOutput<B.Board> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
@@ -96,7 +97,7 @@ export class BoardDomain implements BoardFacade {
     }
 
     private validateUpdate(
-        input: B.UpdateBoardInput,
+        input: BI.UpdateBoardInput,
         board: B.Board,
     ): FacadeOutput<B.Board> {
         return pipe(
@@ -125,7 +126,7 @@ export class BoardDomain implements BoardFacade {
         );
     }
 
-    subscribe(input: B.SubscribeToBoardInput): FacadeOutput<void> {
+    subscribe(input: BI.SubscribeToBoardInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
@@ -138,7 +139,7 @@ export class BoardDomain implements BoardFacade {
         );
     }
 
-    unsubscribe(input: B.UnsubscribeFromBoardInput): FacadeOutput<void> {
+    unsubscribe(input: BI.UnsubscribeFromBoardInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),

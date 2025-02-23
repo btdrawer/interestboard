@@ -1,12 +1,13 @@
 import * as C from "../types/Comment";
+import * as CI from "../types/CommentInput";
 import { FacadeOutput } from "../../common/facade/FacadeOutput";
 
 export interface CommentFacade {
-    create(input: C.CreateCommentInput): FacadeOutput<C.Comment>;
+    create(input: CI.CreateCommentInput): FacadeOutput<C.Comment>;
 
-    listByPost(input: C.ListCommentsByPost): FacadeOutput<C.Comment[]>;
+    listByPost(input: CI.ListCommentsByPost): FacadeOutput<C.Comment[]>;
 
-    listByUser(input: C.ListCommentsByUser): FacadeOutput<C.Comment[]>;
+    listByUser(input: CI.ListCommentsByUser): FacadeOutput<C.Comment[]>;
 
-    delete(input: C.DeleteCommentInput): FacadeOutput<void>;
+    delete(input: CI.DeleteCommentInput): FacadeOutput<void>;
 }
