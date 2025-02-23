@@ -38,6 +38,24 @@ export const createPostInput = t.type({
 
 export type CreatePostInput = t.TypeOf<typeof createPostInput>;
 
+export enum VoteType {
+    Upvote = "Upvote",
+    Downvote = "Downvote",
+}
+
+export const voteType = t.union([
+    t.literal(VoteType.Upvote),
+    t.literal(VoteType.Downvote),
+]);
+
+export const voteInput = t.type({
+    context: userContext,
+    id: postId,
+    type: td.optionFromNullable(voteType),
+});
+
+export type VoteInput = t.TypeOf<typeof voteInput>;
+
 export const listPostsByBoardInput = t.type({
     boardId,
     first: t.number,
