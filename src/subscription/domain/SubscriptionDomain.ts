@@ -8,9 +8,14 @@ import * as SE from "../types/SubscriptionError";
 import { SubscriptionFacade } from "../facade/SubscriptionFacade";
 import { SubscriptionRepository } from "../repository/SubscriptionRepository";
 import { UserFacade } from "../../user/facade/UserFacade";
-import { BoardFacade } from "../../board/facade/BoardFacade";
 import * as RE from "../../common/repository/RepositoryError";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
+import { EventBus } from "../../common/event/EventBus";
+import {
+    subscriptionUpdatedEvent,
+    SubscriptionUpdatedEvent,
+    SubscriptionUpdatedEventBody,
+} from "../event/SubscriptionUpdatedEvent";
 
 export const repositoryErrorToSubscriptionError = (
     repositoryError: RE.RepositoryError<S.BoardSubscriptionId>,
@@ -29,8 +34,11 @@ export const repositoryErrorToSubscriptionError = (
 export class SubscriptionDomain implements SubscriptionFacade {
     constructor(
         private repository: SubscriptionRepository,
+        private eventBus: EventBus<
+            SubscriptionUpdatedEventBody,
+            SubscriptionUpdatedEvent
+        >,
         private userFacade: UserFacade,
-        private boardFacade: BoardFacade,
     ) {}
 
     listSubscriptionsByBoard(
@@ -38,12 +46,12 @@ export class SubscriptionDomain implements SubscriptionFacade {
     ): FacadeOutput<S.BoardSubscription[]> {
         return pipe(
             TE.Do,
-            TE.chain(() => this.boardFacade.get(input.id)),
             TE.chain(() =>
                 this.callRepository(
                     this.repository.listSubscriptionsByBoard(input.id),
                 ),
             ),
+            // TODO return not found if no subscriptions
         );
     }
 
@@ -61,6 +69,9 @@ export class SubscriptionDomain implements SubscriptionFacade {
         );
     }
 
+    // TODO how do we check board exists? Can we trust it does if other subscriptions
+
+    // TODO check other subscriptions exist for board
     subscribe(
         input: SI.SubscribeToBoardInput,
     ): FacadeOutput<S.BoardSubscription> {
@@ -68,7 +79,6 @@ export class SubscriptionDomain implements SubscriptionFacade {
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
             TE.chain(() => this.callRepository(this.repository.find(input.id))),
-            TE.chain(() => this.boardFacade.get(input.id)),
             TE.bind("subscription", () =>
                 this.callRepository(
                     this.repository.save({
@@ -78,19 +88,28 @@ export class SubscriptionDomain implements SubscriptionFacade {
                         ),
                         userId: input.context.userId,
                         boardId: input.id,
+                        type: S.BoardSubscriptionType.Member,
                         created: new Date(),
                     }),
                 ),
             ),
-            // So the number of subscribers can be easily displayed. Fine being eventually consistent?
-            // TODO Maybe make this transactional (turn subscribers into an aggregate?)
-            TE.bind("boardUpdate", () =>
-                this.boardFacade.addSubscriber(input.id),
-            ),
-            TE.map(({ subscription }) => subscription),
+            TE.map(({ subscription }) => {
+                this.eventBus.dispatch(
+                    subscriptionUpdatedEvent(
+                        {
+                            userId: subscription.userId,
+                            boardId: subscription.boardId,
+                            type: subscription.type,
+                        },
+                        new Date(),
+                    ),
+                );
+                return subscription;
+            }),
         );
     }
 
+    // TODO do not allow if no other subscriptions left for board
     unsubscribe(input: SI.UnsubscribeFromBoardInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
@@ -105,9 +124,14 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     ),
                 ),
             ),
-            TE.chain(() => this.boardFacade.removeSubscriber(input.id)),
             TE.map(() => undefined),
         );
+    }
+
+    updateSubscriptionType(
+        input: SI.UpdateSubscriptionType,
+    ): FacadeOutput<S.BoardSubscription> {
+        throw new Error("Method not implemented.");
     }
 
     private callRepository<T>(

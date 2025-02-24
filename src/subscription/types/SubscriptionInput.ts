@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import * as td from "io-ts-types";
-import { userContext } from "../../user/types/User";
+import * as S from "./Subscription";
 import * as U from "../../user/types/User";
 import * as B from "../../board/types/Board";
 
@@ -25,17 +25,26 @@ export type ListSubscriptionsByUserInput = t.TypeOf<
 >;
 
 export const subscribeToBoardInput = t.type({
-    context: userContext,
+    context: U.userContext,
     id: B.boardId,
 });
 
 export type SubscribeToBoardInput = t.TypeOf<typeof subscribeToBoardInput>;
 
 export const unsubscribeFromBoardInput = t.type({
-    context: userContext,
+    context: U.userContext,
     id: B.boardId,
 });
 
 export type UnsubscribeFromBoardInput = t.TypeOf<
     typeof unsubscribeFromBoardInput
 >;
+
+export const updateSubscriptionType = t.type({
+    context: U.userContext,
+    boardId: B.boardId,
+    userId: U.userId,
+    type: S.boardSubscriptionType,
+});
+
+export type UpdateSubscriptionType = t.TypeOf<typeof updateSubscriptionType>;

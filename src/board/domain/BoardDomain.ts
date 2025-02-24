@@ -7,6 +7,8 @@ import * as BI from "../types/BoardInput";
 import * as BE from "../types/BoardError";
 import { BoardFacade } from "../facade/BoardFacade";
 import { UserFacade } from "../../user/facade/UserFacade";
+import { SubscriptionFacade } from "../../subscription/facade/SubscriptionFacade";
+import * as SUE from "../../subscription/event/SubscriptionUpdatedEvent";
 import { BoardRepository } from "../repository/BoardRepository";
 import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import {
@@ -14,6 +16,7 @@ import {
     RepositoryError,
 } from "../../common/repository/RepositoryError";
 import { NonEmptyArray } from "fp-ts/lib/NonEmptyArray";
+import { EventBus } from "../../common/event/EventBus";
 
 export const repositoryErrorToBoardError = (
     repositoryError: RepositoryError<B.BoardId>,
@@ -40,6 +43,11 @@ export class BoardDomain implements BoardFacade {
     constructor(
         private repository: BoardRepository,
         private userFacade: UserFacade,
+        private subscriptionFacade: SubscriptionFacade,
+        private subscriptionUpdatedEventBus: EventBus<
+            SUE.SubscriptionUpdatedEventBody,
+            SUE.SubscriptionUpdatedEvent
+        >,
     ) {}
 
     create(input: BI.CreateBoardInput): FacadeOutput<B.Board> {

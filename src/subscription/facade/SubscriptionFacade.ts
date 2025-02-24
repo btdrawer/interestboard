@@ -16,4 +16,8 @@ export interface SubscriptionFacade {
     ): FacadeOutput<S.BoardSubscription>;
 
     unsubscribe(input: SI.UnsubscribeFromBoardInput): FacadeOutput<void>;
+
+    updateSubscriptionType(
+        input: SI.UpdateSubscriptionType,
+    ): FacadeOutput<S.BoardSubscription>;
 }
