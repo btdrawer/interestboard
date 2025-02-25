@@ -11,11 +11,7 @@ import { UserFacade } from "../../user/facade/UserFacade";
 import * as RE from "../../common/repository/RepositoryError";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 import { EventBus } from "../../common/event/EventBus";
-import {
-    subscriptionUpdatedEvent,
-    SubscriptionUpdatedEvent,
-    SubscriptionUpdatedEventBody,
-} from "../event/SubscriptionUpdatedEvent";
+import * as SUE from "../event/SubscriptionUpdatedEvent";
 
 export const repositoryErrorToSubscriptionError = (
     repositoryError: RE.RepositoryError<S.BoardSubscriptionId>,
@@ -35,8 +31,8 @@ export class SubscriptionDomain implements SubscriptionFacade {
     constructor(
         private repository: SubscriptionRepository,
         private eventBus: EventBus<
-            SubscriptionUpdatedEventBody,
-            SubscriptionUpdatedEvent
+            SUE.SubscriptionUpdatedEventBody,
+            SUE.SubscriptionUpdatedEvent
         >,
         private userFacade: UserFacade,
     ) {}
@@ -51,7 +47,6 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     this.repository.listSubscriptionsByBoard(input.id),
                 ),
             ),
-            // TODO return not found if no subscriptions
         );
     }
 
@@ -69,16 +64,13 @@ export class SubscriptionDomain implements SubscriptionFacade {
         );
     }
 
-    // TODO how do we check board exists? Can we trust it does if other subscriptions
-
-    // TODO check other subscriptions exist for board
     subscribe(
         input: SI.SubscribeToBoardInput,
     ): FacadeOutput<S.BoardSubscription> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.chain(() => this.callRepository(this.repository.find(input.id))),
+            // TODO handle if already exists - idempotent? but 'created' should not be overwritten
             TE.bind("subscription", () =>
                 this.callRepository(
                     this.repository.save({
@@ -88,18 +80,17 @@ export class SubscriptionDomain implements SubscriptionFacade {
                         ),
                         userId: input.context.userId,
                         boardId: input.id,
-                        type: S.BoardSubscriptionType.Member,
                         created: new Date(),
                     }),
                 ),
             ),
             TE.map(({ subscription }) => {
                 this.eventBus.dispatch(
-                    subscriptionUpdatedEvent(
+                    SUE.subscriptionUpdatedEvent(
                         {
                             userId: subscription.userId,
                             boardId: subscription.boardId,
-                            type: subscription.type,
+                            type: SUE.SubscriptionUpdateType.Add,
                         },
                         new Date(),
                     ),
@@ -109,12 +100,14 @@ export class SubscriptionDomain implements SubscriptionFacade {
         );
     }
 
-    // TODO do not allow if no other subscriptions left for board
     unsubscribe(input: SI.UnsubscribeFromBoardInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.chain(() =>
+            TE.bind("subscription", () =>
+                this.callRepository(this.repository.find(input.id)),
+            ),
+            TE.bind("deleteSubscription", () =>
                 this.callRepository(
                     this.repository.delete(
                         S.getBoardSubscriptionId(
@@ -124,14 +117,20 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     ),
                 ),
             ),
-            TE.map(() => undefined),
+            TE.map(({ subscription }) => {
+                this.eventBus.dispatch(
+                    SUE.subscriptionUpdatedEvent(
+                        {
+                            userId: subscription.userId,
+                            boardId: subscription.boardId,
+                            type: SUE.SubscriptionUpdateType.Delete,
+                        },
+                        new Date(),
+                    ),
+                );
+                return undefined;
+            }),
         );
-    }
-
-    updateSubscriptionType(
-        input: SI.UpdateSubscriptionType,
-    ): FacadeOutput<S.BoardSubscription> {
-        throw new Error("Method not implemented.");
     }
 
     private callRepository<T>(

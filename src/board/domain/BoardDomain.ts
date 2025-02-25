@@ -7,7 +7,6 @@ import * as BI from "../types/BoardInput";
 import * as BE from "../types/BoardError";
 import { BoardFacade } from "../facade/BoardFacade";
 import { UserFacade } from "../../user/facade/UserFacade";
-import { SubscriptionFacade } from "../../subscription/facade/SubscriptionFacade";
 import * as SUE from "../../subscription/event/SubscriptionUpdatedEvent";
 import { BoardRepository } from "../repository/BoardRepository";
 import { FacadeOutput } from "../../common/facade/FacadeOutput";
@@ -43,12 +42,19 @@ export class BoardDomain implements BoardFacade {
     constructor(
         private repository: BoardRepository,
         private userFacade: UserFacade,
-        private subscriptionFacade: SubscriptionFacade,
         private subscriptionUpdatedEventBus: EventBus<
             SUE.SubscriptionUpdatedEventBody,
             SUE.SubscriptionUpdatedEvent
         >,
-    ) {}
+    ) {
+        this.subscriptionUpdatedEventBus.addListener((event) => {
+            if (event.body.type === SUE.SubscriptionUpdateType.Add) {
+                this.repository.addSubscriber(event.body.boardId)();
+            } else {
+                this.repository.removeSubscriber(event.body.boardId)();
+            }
+        });
+    }
 
     create(input: BI.CreateBoardInput): FacadeOutput<B.Board> {
         return pipe(
@@ -132,14 +138,6 @@ export class BoardDomain implements BoardFacade {
                 return TE.right(board);
             }),
         );
-    }
-
-    addSubscriber(id: B.BoardId): FacadeOutput<B.Board> {
-        return this.callRepository(this.repository.addSubscriber(id));
-    }
-
-    removeSubscriber(id: B.BoardId): FacadeOutput<B.Board> {
-        return this.callRepository(this.repository.removeSubscriber(id));
     }
 
     private callRepository<T>(

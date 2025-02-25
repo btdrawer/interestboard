@@ -1,13 +1,22 @@
 import * as t from "io-ts";
 import * as E from "../../common/event/Event";
-import * as S from "../types/Subscription";
 import * as U from "../../user/types/User";
 import * as B from "../../board/types/Board";
+
+export enum SubscriptionUpdateType {
+    Add = "Add",
+    Delete = "Delete",
+}
+
+export const subscriptionUpdateType = t.union([
+    t.literal(SubscriptionUpdateType.Add),
+    t.literal(SubscriptionUpdateType.Delete),
+]);
 
 export const subscriptionUpdatedEventBody = t.type({
     userId: U.userId,
     boardId: B.boardId,
-    type: S.boardSubscriptionType,
+    type: subscriptionUpdateType,
 });
 
 export type SubscriptionUpdatedEventBody = t.TypeOf<
@@ -17,7 +26,7 @@ export type SubscriptionUpdatedEventBody = t.TypeOf<
 export const subscriptionUpdatedEventDescriptor =
     E.event<SubscriptionUpdatedEventBody>(
         "SubscriptionUpdated",
-        subscriptionUpdatedEventBody,
+        subscriptionUpdatedEventBody as unknown as t.Type<SubscriptionUpdatedEventBody>,
     );
 
 export const subscriptionUpdatedEvent = (

@@ -8,8 +8,4 @@ export interface BoardFacade {
     get(id: B.BoardId): FacadeOutput<B.Board>;
 
     update(input: BI.UpdateBoardInput): FacadeOutput<B.Board>;
-
-    addSubscriber(id: B.BoardId): FacadeOutput<B.Board>;
-
-    removeSubscriber(id: B.BoardId): FacadeOutput<B.Board>;
 }

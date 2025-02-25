@@ -7,23 +7,10 @@ import { getCompositeId } from "../../common/types/getCompositeId";
 export const boardSubscriptionId = td.UUID;
 export const boardSubscriptionCursor = t.string;
 
-export enum BoardSubscriptionType {
-    Admin = "Admin",
-    Moderator = "Moderator",
-    Member = "Member",
-}
-
-export const boardSubscriptionType = t.union([
-    t.literal(BoardSubscriptionType.Admin),
-    t.literal(BoardSubscriptionType.Moderator),
-    t.literal(BoardSubscriptionType.Member),
-]);
-
 export const boardSubscription = t.type({
     id: boardSubscriptionId,
     userId: U.userId,
     boardId: B.boardId,
-    type: boardSubscriptionType,
     created: td.DateFromISOString,
 });
 
