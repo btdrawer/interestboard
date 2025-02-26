@@ -44,10 +44,3 @@ export const unsubscribeFromBoardInput = t.type({
 export type UnsubscribeFromBoardInput = t.TypeOf<
     typeof unsubscribeFromBoardInput
 >;
-
-export const lockBoardInput = t.type({
-    context: userContext,
-    id: B.boardId,
-});
-
-export type LockBoardInput = t.TypeOf<typeof lockBoardInput>;

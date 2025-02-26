@@ -5,7 +5,7 @@ import { repositoryTest } from "../../../../common/repository/Repository.abstrac
 
 describe("CommentFakeRepository", () => {
     repositoryTest<C.CommentId, C.Comment>(
-        new CommentFakeRepository(),
+        new CommentFakeRepository(new Map<C.CommentId, C.Comment>()),
         commentEntityFactory,
     );
 });

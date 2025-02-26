@@ -11,8 +11,9 @@ export class CommentFakeRepository
     extends FakePaginatedRepository<C.CommentId, C.CommentCursor, C.Comment>
     implements CR.CommentRepository
 {
-    constructor() {
+    constructor(protected entities: Map<C.CommentId, C.Comment>) {
         super(
+            entities,
             C.commentId.type as unknown as t.Type<C.CommentId>, // TODO: Fix io-ts types
             CR.getId,
             CR.getCursor,

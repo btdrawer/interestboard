@@ -37,33 +37,6 @@ export class SubscriptionDomain implements SubscriptionFacade {
         private userFacade: UserFacade,
     ) {}
 
-    listSubscriptionsByBoard(
-        input: SI.ListSubscriptionsByBoardInput,
-    ): FacadeOutput<S.BoardSubscription[]> {
-        return pipe(
-            TE.Do,
-            TE.chain(() =>
-                this.callRepository(
-                    this.repository.listSubscriptionsByBoard(input.id),
-                ),
-            ),
-        );
-    }
-
-    listSubscriptionsByUser(
-        input: SI.ListSubscriptionsByUserInput,
-    ): FacadeOutput<S.BoardSubscription[]> {
-        return pipe(
-            TE.Do,
-            TE.chain(() => this.userFacade.get(input.id)),
-            TE.chain(() =>
-                this.callRepository(
-                    this.repository.listSubscriptionsByUser(input.id),
-                ),
-            ),
-        );
-    }
-
     subscribe(
         input: SI.SubscribeToBoardInput,
     ): FacadeOutput<S.BoardSubscription> {
@@ -97,6 +70,39 @@ export class SubscriptionDomain implements SubscriptionFacade {
                 );
                 return subscription;
             }),
+        );
+    }
+
+    listSubscriptionsByBoard(
+        input: SI.ListSubscriptionsByBoardInput,
+    ): FacadeOutput<S.BoardSubscription[]> {
+        return pipe(
+            TE.Do,
+            TE.chain(() =>
+                this.callRepository(
+                    this.repository.listSubscriptionsByBoard(input.id, {
+                        first: input.first,
+                        cursor: input.cursor,
+                    }),
+                ),
+            ),
+        );
+    }
+
+    listSubscriptionsByUser(
+        input: SI.ListSubscriptionsByUserInput,
+    ): FacadeOutput<S.BoardSubscription[]> {
+        return pipe(
+            TE.Do,
+            TE.chain(() => this.userFacade.get(input.id)),
+            TE.chain(() =>
+                this.callRepository(
+                    this.repository.listSubscriptionsByUser(input.id, {
+                        first: input.first,
+                        cursor: input.cursor,
+                    }),
+                ),
+            ),
         );
     }
 

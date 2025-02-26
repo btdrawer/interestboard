@@ -1,6 +1,9 @@
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as R from "../../common/repository/Repository";
-import { PaginatedRepository } from "../../common/repository/PaginatedRepository";
+import {
+    PaginatedRepository,
+    PaginationOptions,
+} from "../../common/repository/PaginatedRepository";
 import * as S from "../types/Subscription";
 import * as B from "../../board/types/Board";
 import * as U from "../../user/types/User";
@@ -17,10 +20,12 @@ export type SubscriptionRepository = R.Repository<
     > & {
         listSubscriptionsByBoard(
             boardId: B.BoardId,
+            pagination: PaginationOptions<S.BoardSubscriptionCursor>,
         ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]>;
 
         listSubscriptionsByUser(
             userId: U.UserId,
+            pagination: PaginationOptions<S.BoardSubscriptionCursor>,
         ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]>;
     };
 

@@ -6,9 +6,8 @@ import { Repository } from "../../Repository";
 import * as RE from "../../RepositoryError";
 
 export class FakeRepository<ID, T> extends Repository<ID, T> {
-    protected entities: Map<ID, T> = new Map();
-
     constructor(
+        protected entities: Map<ID, T>,
         protected idType: t.Type<ID>,
         protected getId: (entity: T) => ID,
     ) {

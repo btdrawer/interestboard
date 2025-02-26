@@ -14,11 +14,12 @@ export class FakePaginatedRepository<ID, CURSOR, T>
     implements PaginatedRepository<ID, CURSOR, T>
 {
     constructor(
+        protected entities: Map<ID, T>,
         protected idType: t.Type<ID>,
         protected getId: (entity: T) => ID,
         protected getCursor: (entity: T) => CURSOR,
     ) {
-        super(idType, getId);
+        super(entities, idType, getId);
     }
 
     list(
