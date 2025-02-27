@@ -13,6 +13,9 @@ import { FacadeError } from "../../common/facade/FacadeError";
 import { UserFacade } from "../../user/facade/UserFacade";
 import { PostFacade } from "../../post/facade/PostFacade";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
+import { EventBus } from "../../common/event/EventBus";
+import { Action, VoteEvent, VoteEventBody } from "../../vote/event/VoteEvent";
+import { VoteRecordType, VoteType } from "../../vote/types/Vote";
 
 const repositoryErrorToCommentError = (
     repositoryError: RE.RepositoryError<C.CommentId>,
@@ -40,7 +43,44 @@ export class CommentDomain implements CommentFacade {
         private repository: CommentRepository,
         private userFacade: UserFacade,
         private postFacade: PostFacade,
-    ) {}
+        private voteEventBus: EventBus<VoteEventBody, VoteEvent>,
+    ) {
+        this.voteEventBus.addListener((event) => {
+            if (event.body.record.type === VoteRecordType.Comment) {
+                this.updateVotes(event)();
+            }
+        });
+    }
+
+    private updateVotes(event: VoteEvent) {
+        return pipe(
+            TE.Do,
+            TE.chain(() =>
+                this.callRepository(this.repository.find(event.body.record.id)),
+            ),
+            TE.map((comment) => {
+                const type = event.body.type;
+                const action = event.body.action;
+                const updated = {
+                    ...comment,
+                    upvotes:
+                        type === VoteType.Up
+                            ? this.modifyVotes(comment.upvotes, action)
+                            : comment.upvotes,
+                    downvotes:
+                        type === VoteType.Down
+                            ? this.modifyVotes(comment.downvotes, action)
+                            : comment.downvotes,
+                    updated: new Date(),
+                };
+                return this.callRepository(this.repository.save(updated));
+            }),
+        );
+    }
+
+    private modifyVotes(votes: number, action: Action) {
+        return action === Action.Vote ? votes + 1 : votes - 1;
+    }
 
     // TODO validate that postId and parentId are compatible
     create(input: CI.CreateCommentInput): FacadeOutput<C.Comment> {

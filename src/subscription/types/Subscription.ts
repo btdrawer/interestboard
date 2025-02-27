@@ -22,4 +22,4 @@ export const getBoardSubscriptionId = (
     userId: U.UserId,
     boardId: B.BoardId,
 ): BoardSubscriptionId =>
-    getCompositeId(userId, boardId) as BoardSubscriptionId;
+    getCompositeId([userId, boardId]) as BoardSubscriptionId;

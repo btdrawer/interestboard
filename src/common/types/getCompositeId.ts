@@ -1,10 +1,9 @@
 import * as td from "io-ts-types";
 import { createHash } from "crypto";
 
-export const getCompositeId = (userId: td.UUID, boardId: td.UUID): td.UUID => {
+export const getCompositeId = (ids: string[]): td.UUID => {
     const hash = createHash("sha256");
-    hash.update(userId);
-    hash.update(boardId);
+    ids.forEach((id) => hash.update(id));
     const uuid = hash.digest("hex").slice(0, 32);
     return [
         uuid.slice(0, 8),
