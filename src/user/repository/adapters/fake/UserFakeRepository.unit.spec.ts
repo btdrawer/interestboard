@@ -5,7 +5,7 @@ import { repositoryTest } from "../../../../common/repository/Repository.abstrac
 
 describe("UserFakeRepository", () => {
     repositoryTest<U.UserId, U.User>(
-        new UserFakeRepository(),
+        new UserFakeRepository(new Map<U.UserId, U.User>()),
         userEntityFactory,
     );
 });

@@ -5,6 +5,7 @@ import { FacadeOutput } from "../../common/facade/FacadeOutput";
 import * as P from "../types/Post";
 import * as PI from "../types/PostInput";
 import * as PE from "../types/PostError";
+import * as U from "../../user/types/User";
 import { PostFacade } from "../facade/PostFacade";
 import { PostRepository } from "../repository/PostRepository";
 import { UserFacade } from "../../user/facade/UserFacade";
@@ -100,24 +101,6 @@ export class PostDomain implements PostFacade {
         return this.callRepository(this.repository.find(input.id));
     }
 
-    // TODO cannot remove vote, also if changing vote, both upvotes and downvotes should be updated
-    vote(input: PI.VoteInput): FacadeOutput<void> {
-        return pipe(
-            TE.Do,
-            TE.bind("user", () =>
-                this.userFacade.getFromContext(input.context),
-            ),
-            TE.bind("post", () =>
-                this.callRepository(this.repository.find(input.id)),
-            ),
-            TE.chain(({ user, post }) =>
-                this.callRepository(
-                    this.repository.vote(post.id, user.id, input.type),
-                ),
-            ),
-        );
-    }
-
     listByBoard(input: PI.ListPostsByBoardInput): FacadeOutput<P.Post[]> {
         return this.callRepository(
             this.repository.findByBoardId(input.boardId, {
@@ -136,7 +119,6 @@ export class PostDomain implements PostFacade {
         );
     }
 
-    // TODO allow moderators to delete posts
     delete(input: PI.DeletePostInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
@@ -146,12 +128,21 @@ export class PostDomain implements PostFacade {
             TE.bind("post", () =>
                 this.callRepository(this.repository.find(input.id)),
             ),
-            TE.chain(({ user, post }) =>
-                post.authorId === user.id
+            TE.bind("board", ({ post }) => this.boardFacade.get(post.boardId)),
+            TE.chain(({ user, post, board }) =>
+                this.canDeleteComment(user.id, post.authorId, board.moderators)
                     ? this.callRepository(this.repository.delete(post.id))
                     : TE.left(PE.postForbiddenError([post.id], O.none)),
             ),
         );
+    }
+
+    private canDeleteComment(
+        callerId: U.UserId,
+        authorId: U.UserId,
+        moderators: U.UserId[],
+    ) {
+        return callerId === authorId || moderators.includes(callerId);
     }
 
     private callRepository<T>(

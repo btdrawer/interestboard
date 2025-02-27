@@ -13,8 +13,9 @@ export class UserFakeRepository
     extends FakePaginatedRepository<U.UserId, U.UserCursor, U.User>
     implements UR.UserRepository
 {
-    constructor() {
+    constructor(protected entities: Map<U.UserId, U.User>) {
         super(
+            entities,
             U.userId.type as unknown as t.Type<U.UserId>, // TODO not sure why this doesn't work
             UR.getId,
             UR.getCursor,

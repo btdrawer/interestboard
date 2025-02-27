@@ -7,8 +7,6 @@ export interface PostFacade {
 
     get(input: PI.GetPostInput): FacadeOutput<P.Post>;
 
-    vote(input: PI.VoteInput): FacadeOutput<void>;
-
     listByBoard(input: PI.ListPostsByBoardInput): FacadeOutput<P.Post[]>;
 
     listByUser(input: PI.ListPostsByUserInput): FacadeOutput<P.Post[]>;

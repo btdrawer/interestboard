@@ -1,5 +1,6 @@
 import * as TE from "fp-ts/TaskEither";
 import * as O from "fp-ts/Option";
+import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
 import * as U from "../../user/types/User";
 import * as B from "../types/Board";
@@ -14,7 +15,6 @@ import {
     isRepositoryNotFoundError,
     RepositoryError,
 } from "../../common/repository/RepositoryError";
-import { NonEmptyArray } from "fp-ts/lib/NonEmptyArray";
 import { EventBus } from "../../common/event/EventBus";
 
 export const repositoryErrorToBoardError = (
@@ -67,7 +67,7 @@ export class BoardDomain implements BoardFacade {
                     name: input.name,
                     title: input.title,
                     description: input.description,
-                    moderators: [user.id] as NonEmptyArray<U.UserId>,
+                    moderators: [user.id] as NEA.NonEmptyArray<U.UserId>,
                     subscribers: 1,
                     locked: false,
                     created: timestamp,
@@ -88,19 +88,33 @@ export class BoardDomain implements BoardFacade {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.chain(() => this.callRepository(this.repository.find(input.id))),
-            TE.chain((board) => this.validateUpdate(input, board)),
-            TE.map((board) => ({
-                ...board,
-                name: input.name,
-                title: input.title,
-                description: input.description,
-                moderators: [
+            TE.bind("board", () =>
+                this.callRepository(this.repository.find(input.id)),
+            ),
+            TE.bind("validate", ({ board }) =>
+                this.validateUpdate(input, board),
+            ),
+            TE.bind("moderators", ({ board }) => {
+                const newModerators = NEA.fromArray([
                     ...board.moderators.filter(
                         (m) => !input.moderators.remove.includes(m),
                     ),
                     ...input.moderators.add,
-                ] as NonEmptyArray<U.UserId>, // TODO better validation
+                ]);
+                return O.fold<
+                    NEA.NonEmptyArray<U.UserId>,
+                    FacadeOutput<NEA.NonEmptyArray<U.UserId>>
+                >(
+                    () => TE.left(noModeratorsLeftError(input.id)),
+                    (moderators) => TE.right(moderators),
+                )(newModerators);
+            }),
+            TE.map(({ board, moderators }) => ({
+                ...board,
+                name: input.name,
+                title: input.title,
+                description: input.description,
+                moderators,
                 locked: input.locked,
                 updated: new Date(),
             })),
@@ -113,7 +127,7 @@ export class BoardDomain implements BoardFacade {
     private validateUpdate(
         input: BI.UpdateBoardInput,
         board: B.Board,
-    ): FacadeOutput<B.Board> {
+    ): FacadeOutput<void> {
         return pipe(
             TE.Do,
             TE.chain(() => {
@@ -129,14 +143,7 @@ export class BoardDomain implements BoardFacade {
                     ...input.moderators.remove,
                 ]),
             ),
-            TE.chain(() => {
-                if (
-                    input.moderators.remove.length === board.moderators.length
-                ) {
-                    return TE.left(noModeratorsLeftError(input.id));
-                }
-                return TE.right(board);
-            }),
+            TE.map(() => undefined),
         );
     }
 

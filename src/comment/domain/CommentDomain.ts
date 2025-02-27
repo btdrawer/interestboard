@@ -7,6 +7,7 @@ import { CommentRepository } from "../repository/CommentRepository";
 import * as C from "../types/Comment";
 import * as CI from "../types/CommentInput";
 import * as P from "../../post/types/Post";
+import * as U from "../../user/types/User";
 import * as CE from "../types/CommentError";
 import * as RE from "../../common/repository/RepositoryError";
 import { FacadeError } from "../../common/facade/FacadeError";
@@ -16,6 +17,7 @@ import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 import { EventBus } from "../../common/event/EventBus";
 import { Action, VoteEvent, VoteEventBody } from "../../vote/event/VoteEvent";
 import { VoteRecordType, VoteType } from "../../vote/types/Vote";
+import { BoardFacade } from "../../board/facade/BoardFacade";
 
 const repositoryErrorToCommentError = (
     repositoryError: RE.RepositoryError<C.CommentId>,
@@ -42,6 +44,7 @@ export class CommentDomain implements CommentFacade {
     constructor(
         private repository: CommentRepository,
         private userFacade: UserFacade,
+        private boardFacade: BoardFacade,
         private postFacade: PostFacade,
         private voteEventBus: EventBus<VoteEventBody, VoteEvent>,
     ) {
@@ -82,7 +85,6 @@ export class CommentDomain implements CommentFacade {
         return action === Action.Vote ? votes + 1 : votes - 1;
     }
 
-    // TODO validate that postId and parentId are compatible
     create(input: CI.CreateCommentInput): FacadeOutput<C.Comment> {
         return pipe(
             TE.Do,
@@ -98,6 +100,7 @@ export class CommentDomain implements CommentFacade {
                 return {
                     id: C.generateCommentId(),
                     authorId: user.id,
+                    boardId: post.boardId,
                     postId: post.id,
                     parentId: O.map<C.Comment, C.CommentId>(
                         (parent) => parent.id,
@@ -149,7 +152,6 @@ export class CommentDomain implements CommentFacade {
         );
     }
 
-    // TODO allow moderators to delete comments
     delete(input: CI.DeleteCommentInput): FacadeOutput<void> {
         return pipe(
             TE.Do,
@@ -159,12 +161,27 @@ export class CommentDomain implements CommentFacade {
             TE.bind("comment", () =>
                 this.callRepository(this.repository.find(input.id)),
             ),
-            TE.chain(({ user, comment }) =>
-                comment.authorId === user.id
+            TE.bind("board", ({ comment }) =>
+                this.boardFacade.get(comment.boardId),
+            ),
+            TE.chain(({ user, comment, board }) =>
+                this.canDeleteComment(
+                    user.id,
+                    comment.authorId,
+                    board.moderators,
+                )
                     ? this.callRepository(this.repository.delete(comment.id))
                     : TE.left(CE.commentForbiddenError([comment.id], O.none)),
             ),
         );
+    }
+
+    private canDeleteComment(
+        callerId: U.UserId,
+        authorId: U.UserId,
+        moderators: U.UserId[],
+    ) {
+        return callerId === authorId || moderators.includes(callerId);
     }
 
     private callRepository<T>(output: RepositoryOutput<C.CommentId, T>) {
