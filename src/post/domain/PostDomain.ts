@@ -11,6 +11,9 @@ import { UserFacade } from "../../user/facade/UserFacade";
 import { BoardFacade } from "../../board/facade/BoardFacade";
 import * as RE from "../../common/repository/RepositoryError";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
+import { EventBus } from "../../common/event/EventBus";
+import { Action, VoteEvent, VoteEventBody } from "../../vote/event/VoteEvent";
+import { VoteRecordType, VoteType } from "../../vote/types/Vote";
 
 const repositoryErrorToPostError = (
     repositoryError: RE.RepositoryError<P.PostId>,
@@ -26,7 +29,44 @@ export class PostDomain implements PostFacade {
         private repository: PostRepository,
         private userFacade: UserFacade,
         private boardFacade: BoardFacade,
-    ) {}
+        private voteEventBus: EventBus<VoteEventBody, VoteEvent>,
+    ) {
+        this.voteEventBus.addListener((event) => {
+            if (event.body.record.type === VoteRecordType.Post) {
+                this.updateVotes(event)();
+            }
+        });
+    }
+
+    private updateVotes(event: VoteEvent) {
+        return pipe(
+            TE.Do,
+            TE.chain(() =>
+                this.callRepository(this.repository.find(event.body.record.id)),
+            ),
+            TE.chain((post) => {
+                const type = event.body.type;
+                const action = event.body.action;
+                const updated = {
+                    ...post,
+                    upvotes:
+                        type === VoteType.Up
+                            ? this.modifyVotes(post.upvotes, action)
+                            : post.upvotes,
+                    downvotes:
+                        type === VoteType.Down
+                            ? this.modifyVotes(post.downvotes, action)
+                            : post.downvotes,
+                    updated: new Date(),
+                };
+                return this.callRepository(this.repository.save(updated));
+            }),
+        );
+    }
+
+    private modifyVotes(votes: number, action: Action) {
+        return action === Action.Vote ? votes + 1 : votes - 1;
+    }
 
     create(input: PI.CreatePostInput): FacadeOutput<P.Post> {
         return pipe(

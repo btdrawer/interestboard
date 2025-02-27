@@ -58,7 +58,7 @@ export class CommentDomain implements CommentFacade {
             TE.chain(() =>
                 this.callRepository(this.repository.find(event.body.record.id)),
             ),
-            TE.map((comment) => {
+            TE.chain((comment) => {
                 const type = event.body.type;
                 const action = event.body.action;
                 const updated = {
