@@ -34,6 +34,7 @@ export class VoteDomain implements VoteFacade {
         private userFacade: UserFacade,
     ) {}
 
+    // TODO can vote on non-existent IDs
     vote(input: VI.VoteInput): FacadeOutput<V.Vote> {
         return pipe(
             TE.Do,

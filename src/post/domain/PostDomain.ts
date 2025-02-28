@@ -25,6 +25,10 @@ const repositoryErrorToPostError = (
     return PE.postInternalError(repositoryError.ids, O.none);
 };
 
+/*
+ * TODO should post and comment be merged?
+ * Similar logic and entities.
+ */
 export class PostDomain implements PostFacade {
     constructor(
         private repository: PostRepository,
