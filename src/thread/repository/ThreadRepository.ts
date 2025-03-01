@@ -6,14 +6,13 @@ import {
     PaginationOptions,
 } from "../../common/repository/PaginatedRepository";
 import * as T from "../types/Thread";
-import * as P from "../../post/types/Post";
 import * as U from "../../user/types/User";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type ThreadRepository = Repository<T.ThreadId, T.Thread> &
     PaginatedRepository<T.ThreadId, T.ThreadCursor, T.Thread> & {
         listByParentId: (
-            parentId: O.Option<P.PostId>,
+            parentId: O.Option<T.ThreadId>,
             pagination: PaginationOptions<T.ThreadCursor>,
         ) => RepositoryOutput<T.ThreadId, T.Thread[]>;
 

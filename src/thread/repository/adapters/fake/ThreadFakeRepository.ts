@@ -3,7 +3,6 @@ import * as O from "fp-ts/Option";
 import { FakePaginatedRepository } from "../../../../common/repository/adapters/fake/FakePaginatedRepository";
 import { PaginationOptions } from "../../../../common/repository/PaginatedRepository";
 import { RepositoryOutput } from "../../../../common/repository/RepositoryOutput";
-import { PostId } from "../../../../post/types/Post";
 import * as T from "../../../types/Thread";
 import * as TR from "../../ThreadRepository";
 import { UserId } from "../../../../user/types/User";
