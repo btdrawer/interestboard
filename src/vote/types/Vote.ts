@@ -1,34 +1,10 @@
 import * as t from "io-ts";
 import * as td from "io-ts-types";
 import * as U from "../../user/types/User";
-import * as P from "../../post/types/Post";
-import * as C from "../../comment/types/Comment";
+import * as T from "../../thread/types/Thread";
 import { getCompositeId } from "../../common/types/getCompositeId";
 
 export const voteId = td.UUID;
-
-export enum VoteRecordType {
-    Post = "Post",
-    Comment = "Comment",
-}
-
-export const voteRecordType = t.union([
-    t.literal(VoteRecordType.Post),
-    t.literal(VoteRecordType.Comment),
-]);
-
-export const postVoteRecord = t.type({
-    type: t.literal(VoteRecordType.Post),
-    id: P.postId,
-});
-
-export const commentVoteRecord = t.type({
-    type: t.literal(VoteRecordType.Comment),
-    id: C.commentId,
-    postId: P.postId,
-});
-
-export const voteRecord = t.union([postVoteRecord, commentVoteRecord]);
 
 export enum VoteType {
     Up = "Up",
@@ -43,19 +19,15 @@ export const voteType = t.union([
 export const vote = t.type({
     id: voteId,
     userId: U.userId,
-    record: voteRecord,
+    threadId: T.threadId,
+    parentId: td.optionFromNullable(T.threadId),
     type: voteType,
+    created: td.DateFromISOString,
+    updated: td.DateFromISOString,
 });
-
-export type PostVoteRecord = t.TypeOf<typeof postVoteRecord>;
-export type CommentVoteRecord = t.TypeOf<typeof commentVoteRecord>;
-export type VoteRecord = t.TypeOf<typeof voteRecord>;
 
 export type VoteId = t.TypeOf<typeof voteId>;
 export type Vote = t.TypeOf<typeof vote>;
 
-export const generateVoteRecordId = <ID>(
-    userId: U.UserId,
-    recordType: string,
-    recordId: string,
-) => getCompositeId([userId, recordType, recordId]);
+export const generateVoteRecordId = (userId: U.UserId, threadId: T.ThreadId) =>
+    getCompositeId([userId, threadId]);

@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import * as E from "../../common/event/Event";
 import * as V from "../types/Vote";
 import * as U from "../../user/types/User";
+import * as T from "../../thread/types/Thread";
 
 export enum Action {
     Vote = "Vote",
@@ -15,7 +16,7 @@ export const action = t.union([
 
 export const voteEventBody = t.type({
     userId: U.userId,
-    record: V.voteRecord,
+    threadId: T.threadId,
     type: V.voteType,
     action,
 });

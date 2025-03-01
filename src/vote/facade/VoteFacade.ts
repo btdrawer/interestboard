@@ -5,8 +5,8 @@ import * as VI from "../types/VoteInput";
 export interface VoteFacade {
     vote(input: VI.VoteInput): FacadeOutput<V.Vote>;
 
-    listUserVotesByPost(
-        input: VI.ListUserVotesByPostInput,
+    listUserVotesByThread(
+        input: VI.ListUserVotesByThreadInput,
     ): FacadeOutput<V.Vote[]>;
 
     unvote(input: VI.UnvoteInput): FacadeOutput<void>;

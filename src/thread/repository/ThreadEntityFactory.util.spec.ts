@@ -1,15 +1,15 @@
 import * as O from "fp-ts/Option";
-import * as C from "../types/Comment";
-import * as P from "../../post/types/Post";
+import * as T from "../types/Thread";
 import * as U from "../../user/types/User";
+import * as B from "../../board/types/Board";
 import { EntityFactory } from "../../common/repository/Repository.abstract.spec";
 
-export const commentEntityFactory: EntityFactory<C.CommentId, C.Comment> = {
-    newId: () => C.generateCommentId(),
-    newEntity: (id: C.CommentId) => ({
+export const threadEntityFactory: EntityFactory<T.ThreadId, T.Thread> = {
+    newId: () => T.generateThreadId(),
+    newEntity: (id: T.ThreadId) => ({
         id,
-        postId: P.generatePostId(),
         authorId: U.generateUserId(),
+        boardId: B.generateBoardId(),
         parentId: O.none,
         body: "Hello, world!",
         upvotes: 0,
@@ -18,7 +18,7 @@ export const commentEntityFactory: EntityFactory<C.CommentId, C.Comment> = {
         updated: new Date(),
         deleted: O.none,
     }),
-    updateEntity: (entity: C.Comment) => ({
+    updateEntity: (entity: T.Thread) => ({
         ...entity,
         body: "Hello, universe!",
         updated: new Date(),

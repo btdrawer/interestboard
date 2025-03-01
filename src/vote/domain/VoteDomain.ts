@@ -40,16 +40,16 @@ export class VoteDomain implements VoteFacade {
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
             TE.map((user) => {
-                const id = V.generateVoteRecordId(
-                    user.id,
-                    input.record.type,
-                    input.record.id,
-                );
+                const id = V.generateVoteRecordId(user.id, input.threadId);
+                const date = new Date();
                 return {
                     id,
                     userId: user.id,
-                    record: input.record,
+                    threadId: input.threadId,
+                    parentId: input.parentId,
                     type: input.type,
+                    created: date,
+                    updated: date,
                 };
             }),
             TE.chain((vote) => this.callRepository(this.repository.save(vote))),
@@ -58,7 +58,7 @@ export class VoteDomain implements VoteFacade {
                     voteEvent(
                         {
                             userId: vote.userId,
-                            record: vote.record,
+                            threadId: vote.threadId,
                             type: vote.type,
                             action: Action.Vote,
                         },
@@ -70,17 +70,17 @@ export class VoteDomain implements VoteFacade {
         );
     }
 
-    listUserVotesByPost(
-        input: VI.ListUserVotesByPostInput,
+    listUserVotesByThread(
+        input: VI.ListUserVotesByThreadInput,
     ): FacadeOutput<V.Vote[]> {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
             TE.chain((user) =>
                 this.callRepository(
-                    this.repository.listVotesByUserIdAndPostId(
+                    this.repository.listVotesByUserIdAndThreadId(
                         user.id,
-                        input.postId,
+                        input.threadId,
                     ),
                 ),
             ),
@@ -94,13 +94,7 @@ export class VoteDomain implements VoteFacade {
                 this.userFacade.getFromContext(input.context),
             ),
             TE.bind("id", ({ user }) =>
-                TE.right(
-                    V.generateVoteRecordId(
-                        user.id,
-                        input.record.type,
-                        input.record.id,
-                    ),
-                ),
+                TE.right(V.generateVoteRecordId(user.id, input.threadId)),
             ),
             TE.bind("vote", ({ id }) =>
                 this.callRepository(this.repository.find(id)),
@@ -113,7 +107,7 @@ export class VoteDomain implements VoteFacade {
                     voteEvent(
                         {
                             userId: input.context.userId,
-                            record: input.record,
+                            threadId: input.threadId,
                             type: vote.type,
                             action: Action.Unvote,
                         },
