@@ -5,7 +5,8 @@ import { pipe } from "fp-ts/function";
 import * as NEA from "fp-ts/NonEmptyArray";
 import { EntityData, MikroORM, raw } from "@mikro-orm/core";
 import * as B from "../../../types/Board";
-import { Board as BoardEntity } from "./BoardEntity";
+import { Board as BoardEntity, BoardModerator } from "./BoardEntity";
+import * as U from "../../../../user/types/User";
 import { RelationalPaginatedRepository } from "../../../../common/repository/adapters/relational/RelationalPaginatedRepository";
 import * as RE from "../../../../common/repository/RepositoryError";
 import * as BR from "../../BoardRepository";
@@ -74,7 +75,10 @@ export class BoardRelationalRepository
         entity.name = board.name;
         entity.title = board.title;
         entity.description = O.toUndefined(board.description);
-        entity.moderators = board.moderators;
+        entity.moderators = board.moderators.map((moderatorId) => ({
+            boardId: entity.id,
+            userId: moderatorId,
+        })) as NEA.NonEmptyArray<BoardModerator>;
         entity.subscribers = board.subscribers;
         entity.locked = board.locked;
         entity.created = board.created;
@@ -88,7 +92,9 @@ export class BoardRelationalRepository
             name: entity.name,
             title: entity.title,
             description: O.fromNullable(entity.description),
-            moderators: entity.moderators,
+            moderators: entity.moderators.map(
+                (moderator) => moderator.userId,
+            ) as NEA.NonEmptyArray<U.UserId>,
             subscribers: entity.subscribers,
             locked: entity.locked,
             created: entity.created,

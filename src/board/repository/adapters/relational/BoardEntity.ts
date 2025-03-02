@@ -1,7 +1,22 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import {
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryKey,
+    Property,
+} from "@mikro-orm/core";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as B from "../../../types/Board";
 import * as U from "../../../../user/types/User";
+
+@Entity()
+export class BoardModerator {
+    @ManyToOne({ primary: true })
+    boardId!: B.BoardId;
+
+    @ManyToOne({ primary: true })
+    userId!: U.UserId;
+}
 
 @Entity()
 export class Board {
@@ -17,8 +32,8 @@ export class Board {
     @Property()
     description?: string;
 
-    @Property()
-    moderators!: NEA.NonEmptyArray<U.UserId>;
+    @OneToMany(() => BoardModerator, (moderator) => moderator.boardId)
+    moderators!: NEA.NonEmptyArray<BoardModerator>;
 
     @Property()
     subscribers!: number;
