@@ -100,3 +100,8 @@ export const repositoryError = <ID>(idType: t.Type<ID>) =>
 export type RepositoryError<ID> = t.TypeOf<
     ReturnType<typeof repositoryError<ID>>
 >;
+
+export const isRepositoryError = <ID>(
+    error: unknown,
+    idType: t.Type<ID>,
+): error is RepositoryError<ID> => repositoryError(idType).is(error);

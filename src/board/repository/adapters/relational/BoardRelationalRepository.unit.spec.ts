@@ -3,16 +3,16 @@ import {
     PostgreSqlContainer,
     StartedPostgreSqlContainer,
 } from "@testcontainers/postgresql";
-import { User as UserEntity } from "./UserEntity";
-import { UserRelationalRepository } from "./UserRelationalRepository";
-import { userRepositoryTest } from "../../UserRepository.abstract.spec";
+import { Board as BoardEntity } from "./BoardEntity";
+import { BoardRelationalRepository } from "./BoardRelationalRepository";
+import { boardRepositoryTest } from "../../BoardRepository.abstract.spec";
 
-describe("UserRelationalRepository", () => {
+describe("BoardRelationalRepository", () => {
     let container: StartedPostgreSqlContainer;
 
     const orm = () =>
         MikroORM.initSync({
-            entities: [UserEntity],
+            entities: [BoardEntity],
             dbName: "postgres",
             migrations: {
                 tableName: "migrations",
@@ -27,7 +27,7 @@ describe("UserRelationalRepository", () => {
         await migrator.up();
     });
 
-    userRepositoryTest(() => new UserRelationalRepository(orm()));
+    boardRepositoryTest(() => new BoardRelationalRepository(orm()));
 
     afterAll(async () => {
         await container.stop();

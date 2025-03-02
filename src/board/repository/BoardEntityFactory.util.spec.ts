@@ -1,10 +1,11 @@
 import * as O from "fp-ts/Option";
 import * as NEA from "fp-ts/NonEmptyArray";
 import * as B from "../types/Board";
+import * as BR from "./BoardRepository";
 import * as U from "../../user/types/User";
-import { EntityFactory } from "../../common/repository/Repository.abstract.spec";
+import { PaginatedEntityFactory } from "../../common/repository/PaginatedRepository.abstract.spec";
 
-export const commentEntityFactory: EntityFactory<B.BoardId, B.Board> = {
+export const boardEntityFactory: PaginatedEntityFactory<B.BoardId, B.Board> = {
     newId: () => B.generateBoardId(),
     newEntity: (id: B.BoardId) => ({
         id,
@@ -21,4 +22,6 @@ export const commentEntityFactory: EntityFactory<B.BoardId, B.Board> = {
         ...entity,
         updated: new Date(),
     }),
+    getId: BR.getId,
+    getCursor: BR.getCursor,
 };

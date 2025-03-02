@@ -86,6 +86,9 @@ export abstract class RelationalRepository<
     ): TE.TaskEither<RE.RepositoryError<ID>, A> {
         return pipe(
             TE.tryCatch(fn, (error) => {
+                if (RE.isRepositoryError(error, this.idType)) {
+                    return error;
+                }
                 if (
                     error instanceof NotNullConstraintViolationException ||
                     error instanceof UniqueConstraintViolationException
