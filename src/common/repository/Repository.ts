@@ -35,3 +35,11 @@ export const generateCursor =
         Buffer.from(extractFields(entity).join(":"), "utf-8").toString(
             "base64",
         );
+
+export const decodeCursor = (
+    cursor: string,
+): O.Option<NEA.NonEmptyArray<string>> => {
+    return NEA.fromArray(
+        Buffer.from(cursor, "base64").toString("utf-8").split(":"),
+    );
+};

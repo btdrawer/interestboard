@@ -5,7 +5,7 @@ import * as B from "../types/Board";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type BoardRepository = Repository<B.BoardId, B.Board> &
-    PaginatedRepository<B.BoardId, B.BoardCursor, B.Board> & {
+    PaginatedRepository<B.BoardId, B.Board> & {
         addSubscriber(id: B.BoardId): RepositoryOutput<B.BoardId, B.Board>;
 
         removeSubscriber(id: B.BoardId): RepositoryOutput<B.BoardId, B.Board>;

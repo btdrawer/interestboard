@@ -12,11 +12,7 @@ import { UserId } from "../../../../user/types/User";
 import { PaginationOptions } from "../../../../common/repository/PaginatedRepository";
 
 export class SubscriptionFakeRepository
-    extends FakePaginatedRepository<
-        S.BoardSubscriptionId,
-        S.BoardSubscriptionCursor,
-        S.BoardSubscription
-    >
+    extends FakePaginatedRepository<S.BoardSubscriptionId, S.BoardSubscription>
     implements SR.SubscriptionRepository
 {
     // provide board entities here to simulate foreign key constraints
@@ -57,7 +53,7 @@ export class SubscriptionFakeRepository
 
     listSubscriptionsByBoard(
         boardId: B.BoardId,
-        pagination: PaginationOptions<S.BoardSubscriptionCursor>,
+        pagination: PaginationOptions,
     ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]> {
         return this.listWithFilter((entity) => entity.boardId === boardId)(
             pagination,
@@ -66,7 +62,7 @@ export class SubscriptionFakeRepository
 
     listSubscriptionsByUser(
         userId: UserId,
-        pagination: PaginationOptions<S.BoardSubscriptionCursor>,
+        pagination: PaginationOptions,
     ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]> {
         return this.listWithFilter((entity) => entity.userId === userId)(
             pagination,

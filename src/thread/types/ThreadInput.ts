@@ -16,7 +16,7 @@ export type CreateThreadInput = t.TypeOf<typeof createThreadInput>;
 export const listThreadsByParent = t.type({
     parentId: td.optionFromNullable(T.threadId),
     first: t.number,
-    cursor: td.optionFromNullable(T.threadCursor),
+    cursor: td.optionFromNullable(t.string),
 });
 
 export type ListThreadsByParent = t.TypeOf<typeof listThreadsByParent>;
@@ -24,7 +24,7 @@ export type ListThreadsByParent = t.TypeOf<typeof listThreadsByParent>;
 export const listThreadsByUser = t.type({
     userId,
     first: t.number,
-    cursor: td.optionFromNullable(T.threadCursor),
+    cursor: td.optionFromNullable(t.string),
 });
 
 export type ListThreadsByUser = t.TypeOf<typeof listThreadsByUser>;

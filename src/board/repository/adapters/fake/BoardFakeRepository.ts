@@ -5,7 +5,7 @@ import * as BR from "../../BoardRepository";
 import { RepositoryOutput } from "../../../../common/repository/RepositoryOutput";
 
 export class BoardFakeRepository
-    extends FakePaginatedRepository<B.BoardId, B.BoardCursor, B.Board>
+    extends FakePaginatedRepository<B.BoardId, B.Board>
     implements BR.BoardRepository
 {
     constructor(protected entities: Map<B.BoardId, B.Board>) {

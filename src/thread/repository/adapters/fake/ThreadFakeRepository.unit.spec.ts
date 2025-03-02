@@ -5,7 +5,7 @@ import { repositoryTest } from "../../../../common/repository/Repository.abstrac
 
 describe("ThreadFakeRepository", () => {
     repositoryTest<T.ThreadId, T.Thread>(
-        new ThreadFakeRepository(new Map<T.ThreadId, T.Thread>()),
+        () => new ThreadFakeRepository(new Map<T.ThreadId, T.Thread>()),
         threadEntityFactory,
     );
 });

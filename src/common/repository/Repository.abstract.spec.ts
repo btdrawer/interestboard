@@ -9,9 +9,11 @@ export interface EntityFactory<ID, T> {
 }
 
 export const repositoryTest = <ID, T>(
-    repository: R.Repository<ID, T>,
+    repositoryF: () => R.Repository<ID, T>,
     factory: EntityFactory<ID, T>,
 ) => {
+    const repository = repositoryF();
+
     describe("Repository", () => {
         it("should save an entity", async () => {
             const entity = factory.newEntity(factory.newId());

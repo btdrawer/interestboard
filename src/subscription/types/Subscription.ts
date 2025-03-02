@@ -5,7 +5,6 @@ import * as B from "../../board/types/Board";
 import { getCompositeId } from "../../common/types/getCompositeId";
 
 export const boardSubscriptionId = td.UUID;
-export const boardSubscriptionCursor = t.string;
 
 export const boardSubscription = t.type({
     id: boardSubscriptionId,
@@ -15,7 +14,6 @@ export const boardSubscription = t.type({
 });
 
 export type BoardSubscriptionId = t.TypeOf<typeof boardSubscriptionId>;
-export type BoardSubscriptionCursor = t.TypeOf<typeof boardSubscriptionCursor>;
 export type BoardSubscription = t.TypeOf<typeof boardSubscription>;
 
 export const getBoardSubscriptionId = (

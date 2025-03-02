@@ -1,7 +1,8 @@
 import * as U from "../types/User";
-import { EntityFactory } from "../../common/repository/Repository.abstract.spec";
+import * as UR from "./UserRepository";
+import { PaginatedEntityFactory } from "../../common/repository/PaginatedRepository.abstract.spec";
 
-export const userEntityFactory: EntityFactory<U.UserId, U.User> = {
+export const userEntityFactory: PaginatedEntityFactory<U.UserId, U.User> = {
     newId: () => U.generateUserId(),
     newEntity: (id: U.UserId) => ({
         id,
@@ -16,4 +17,6 @@ export const userEntityFactory: EntityFactory<U.UserId, U.User> = {
         name: "Jane Doe",
         updated: new Date(),
     }),
+    getId: UR.getId,
+    getCursor: UR.getCursor,
 };

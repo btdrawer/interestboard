@@ -3,7 +3,6 @@ import * as td from "io-ts-types";
 import { v4 as uuidv4 } from "uuid";
 
 export const userId = td.UUID;
-export const userCursor = t.string;
 
 export const user = t.type({
     id: userId,
@@ -15,7 +14,6 @@ export const user = t.type({
 });
 
 export type UserId = t.TypeOf<typeof userId>;
-export type UserCursor = t.TypeOf<typeof userCursor>;
 export type User = t.TypeOf<typeof user>;
 
 export const generateUserId = (): UserId => uuidv4() as UserId;

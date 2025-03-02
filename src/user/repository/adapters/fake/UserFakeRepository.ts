@@ -10,7 +10,7 @@ import { RepositoryOutput } from "../../../../common/repository/RepositoryOutput
 import * as RE from "../../../../common/repository/RepositoryError";
 
 export class UserFakeRepository
-    extends FakePaginatedRepository<U.UserId, U.UserCursor, U.User>
+    extends FakePaginatedRepository<U.UserId, U.User>
     implements UR.UserRepository
 {
     constructor(protected entities: Map<U.UserId, U.User>) {

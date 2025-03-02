@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import { userId } from "../../user/types/User";
 
 export const boardId = td.UUID;
-export const boardCursor = t.string;
 
 export const board = t.type({
     id: boardId,
@@ -19,7 +18,6 @@ export const board = t.type({
 });
 
 export type BoardId = t.TypeOf<typeof boardId>;
-export type BoardCursor = t.TypeOf<typeof boardCursor>;
 export type Board = t.TypeOf<typeof board>;
 
 export const generateBoardId = (): BoardId => uuidv4() as BoardId;

@@ -8,7 +8,7 @@ import * as TR from "../../ThreadRepository";
 import { UserId } from "../../../../user/types/User";
 
 export class ThreadFakeRepository
-    extends FakePaginatedRepository<T.ThreadId, T.ThreadCursor, T.Thread>
+    extends FakePaginatedRepository<T.ThreadId, T.Thread>
     implements TR.ThreadRepository
 {
     constructor(protected entities: Map<T.ThreadId, T.Thread>) {
@@ -22,14 +22,14 @@ export class ThreadFakeRepository
 
     listByParentId(
         parentId: O.Option<T.ThreadId>,
-        pagination: PaginationOptions<T.ThreadCursor>,
+        pagination: PaginationOptions,
     ): RepositoryOutput<T.ThreadId, T.Thread[]> {
         return this.listWithFilter((t) => t.parentId === parentId)(pagination);
     }
 
     listByUserId(
         userId: UserId,
-        pagination: PaginationOptions<T.ThreadCursor>,
+        pagination: PaginationOptions,
     ): RepositoryOutput<T.ThreadId, T.Thread[]> {
         return this.listWithFilter((t) => t.authorId === userId)(pagination);
     }

@@ -10,15 +10,15 @@ import * as U from "../../user/types/User";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type ThreadRepository = Repository<T.ThreadId, T.Thread> &
-    PaginatedRepository<T.ThreadId, T.ThreadCursor, T.Thread> & {
+    PaginatedRepository<T.ThreadId, T.Thread> & {
         listByParentId: (
             parentId: O.Option<T.ThreadId>,
-            pagination: PaginationOptions<T.ThreadCursor>,
+            pagination: PaginationOptions,
         ) => RepositoryOutput<T.ThreadId, T.Thread[]>;
 
         listByUserId: (
             userId: U.UserId,
-            pagination: PaginationOptions<T.ThreadCursor>,
+            pagination: PaginationOptions,
         ) => RepositoryOutput<T.ThreadId, T.Thread[]>;
     };
 

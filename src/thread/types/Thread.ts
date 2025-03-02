@@ -5,7 +5,6 @@ import { userId } from "../../user/types/User";
 import { boardId } from "../../board/types/Board";
 
 export const threadId = td.UUID;
-export const threadCursor = t.string;
 
 export const thread = t.type({
     id: threadId,
@@ -21,7 +20,6 @@ export const thread = t.type({
 });
 
 export type ThreadId = t.TypeOf<typeof threadId>;
-export type ThreadCursor = t.TypeOf<typeof threadCursor>;
 export type Thread = t.TypeOf<typeof thread>;
 
 export const generateThreadId = (): ThreadId => uuidv4() as ThreadId;

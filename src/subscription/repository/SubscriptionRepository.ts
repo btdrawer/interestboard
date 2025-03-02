@@ -13,19 +13,15 @@ export type SubscriptionRepository = R.Repository<
     S.BoardSubscriptionId,
     S.BoardSubscription
 > &
-    PaginatedRepository<
-        S.BoardSubscriptionId,
-        S.BoardSubscriptionCursor,
-        S.BoardSubscription
-    > & {
+    PaginatedRepository<S.BoardSubscriptionId, S.BoardSubscription> & {
         listSubscriptionsByBoard(
             boardId: B.BoardId,
-            pagination: PaginationOptions<S.BoardSubscriptionCursor>,
+            pagination: PaginationOptions,
         ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]>;
 
         listSubscriptionsByUser(
             userId: U.UserId,
-            pagination: PaginationOptions<S.BoardSubscriptionCursor>,
+            pagination: PaginationOptions,
         ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]>;
     };
 

@@ -30,12 +30,12 @@ export abstract class RelationalRepository<
         protected entityName: EntityName<ENTITY>,
     ) {
         super(idType);
-        this.entityRepository = this.orm.em.getRepository(entityName);
+        this.entityRepository = this.orm.em.fork().getRepository(entityName);
     }
 
-    abstract createEntity(entity: T): ENTITY;
+    protected abstract createEntity(entity: T): ENTITY;
 
-    abstract fromEntity(entity: ENTITY): T;
+    protected abstract fromEntity(entity: ENTITY): T;
 
     save(entity: T): RepositoryOutput<ID, T> {
         const entityToSave = this.createEntity(entity);
@@ -72,7 +72,11 @@ export abstract class RelationalRepository<
                     [this.idColumnName]: id,
                 } as FilterQuery<ENTITY>),
             ),
-            TE.map(() => undefined),
+            TE.chain((result) =>
+                result === 1
+                    ? TE.right(undefined)
+                    : TE.left(RE.entityNotFoundError(id)),
+            ),
         );
     }
 
@@ -94,6 +98,10 @@ export abstract class RelationalRepository<
                 if (error instanceof DriverException) {
                     return RE.repositoryInternalError(ids, error.message);
                 }
+                console.error(
+                    `Unknown error in repository for entity ${this.entityName} with ids ${ids}`,
+                    error,
+                );
                 return RE.repositoryInternalError(
                     ids,
                     "An unknown error occurred.",

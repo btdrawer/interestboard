@@ -5,7 +5,7 @@ import * as U from "../types/User";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 
 export type UserRepository = R.Repository<U.UserId, U.User> &
-    PaginatedRepository<U.UserId, U.UserCursor, U.User> & {
+    PaginatedRepository<U.UserId, U.User> & {
         saveNewUser(user: U.User): RepositoryOutput<U.UserId, U.User>;
 
         findByIds(

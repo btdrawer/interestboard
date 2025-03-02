@@ -9,27 +9,27 @@ import {
 import * as RE from "../../RepositoryError";
 import { FakeRepository } from "./FakeRepository";
 
-export class FakePaginatedRepository<ID, CURSOR, T>
+export class FakePaginatedRepository<ID, T>
     extends FakeRepository<ID, T>
-    implements PaginatedRepository<ID, CURSOR, T>
+    implements PaginatedRepository<ID, T>
 {
     constructor(
         protected entities: Map<ID, T>,
         protected idType: t.Type<ID>,
         protected getId: (entity: T) => ID,
-        protected getCursor: (entity: T) => CURSOR,
+        protected getCursor: (entity: T) => string,
     ) {
         super(entities, idType, getId);
     }
 
     list(
-        options: PaginationOptions<CURSOR>,
+        options: PaginationOptions,
     ): TE.TaskEither<RE.RepositoryError<ID>, T[]> {
         return this.listWithFilter(() => true)(options);
     }
 
     protected listWithFilter(predicate: (entity: T) => boolean) {
-        return (options: PaginationOptions<CURSOR>) =>
+        return (options: PaginationOptions) =>
             pipe(
                 TE.Do,
                 TE.map(() =>
@@ -39,9 +39,9 @@ export class FakePaginatedRepository<ID, CURSOR, T>
             );
     }
 
-    private applyPaginationToList(options: PaginationOptions<CURSOR>) {
+    private applyPaginationToList(options: PaginationOptions) {
         return (entities: T[]) => {
-            const entitiesAfterCursor = O.fold<CURSOR, T[]>(
+            const entitiesAfterCursor = O.fold<string, T[]>(
                 () => entities,
                 (cursor) =>
                     entities.filter(

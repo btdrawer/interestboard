@@ -10,33 +10,28 @@ import {
     PaginationOptions,
 } from "../../PaginatedRepository";
 import { RelationalRepository } from "./RelationalRepository";
-
-export type CursorValue = {
-    columnName: string;
-    resolve: (cursor: string) => string;
-};
+import { decodeCursor } from "../../Repository";
 
 export abstract class RelationalPaginatedRepository<
         ID,
-        CURSOR,
         T,
         ENTITY extends object,
     >
     extends RelationalRepository<ID, T, ENTITY>
-    implements PaginatedRepository<ID, CURSOR, T>
+    implements PaginatedRepository<ID, T>
 {
     constructor(
         protected idType: t.Type<ID>,
         protected getId: (entity: T) => ID,
         protected idColumnName: string,
-        protected cursorValues: NEA.NonEmptyArray<CursorValue>,
+        protected cursorColumnNames: NEA.NonEmptyArray<string>,
         protected orm: MikroORM,
         protected entityName: EntityName<ENTITY>,
     ) {
         super(idType, getId, idColumnName, orm, entityName);
     }
 
-    list(options: PaginationOptions<CURSOR>): RepositoryOutput<ID, T[]> {
+    list(options: PaginationOptions): RepositoryOutput<ID, T[]> {
         const filters = O.getOrElse(() => ({}))(
             O.map(this.getFiltersFromCursor)(options.cursor),
         );
@@ -48,16 +43,20 @@ export abstract class RelationalPaginatedRepository<
         );
     }
 
-    protected getFiltersFromCursor(cursor: CURSOR) {
-        return this.cursorValues.reduce(
-            (acc, cursorValue) => ({
-                ...acc,
-
-                [cursorValue.columnName]: {
-                    $gt: cursorValue.resolve(cursor as string),
-                },
-            }),
-            {},
+    protected getFiltersFromCursor(cursor: string) {
+        return pipe(
+            decodeCursor(cursor),
+            O.map((decodedCursor) =>
+                this.cursorColumnNames.reduce((acc, columnName, i) => {
+                    const columnValue = decodedCursor[i];
+                    return {
+                        ...acc,
+                        [columnName]: {
+                            $gt: columnValue,
+                        },
+                    };
+                }, {}),
+            ),
         );
     }
 }
