@@ -25,8 +25,9 @@ export type SubscriptionRepository = R.Repository<
         ): RepositoryOutput<S.BoardSubscriptionId, S.BoardSubscription[]>;
     };
 
-export const getId = (user: S.BoardSubscription): S.BoardSubscriptionId =>
-    user.id;
+export const getId = (
+    subscription: S.BoardSubscription,
+): S.BoardSubscriptionId => subscription.id;
 
 export const getCursor = R.generateCursor<S.BoardSubscription>(
     (subscription) =>

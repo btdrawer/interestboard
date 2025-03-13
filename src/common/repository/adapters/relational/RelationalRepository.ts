@@ -41,10 +41,14 @@ export abstract class RelationalRepository<
         const entityToSave = this.createEntity(entity);
         return pipe(
             this.callOrm([this.getId(entity)], () =>
-                this.entityRepository.upsert(entityToSave),
+                this.saveOperation(entityToSave),
             ),
             TE.map(() => entity),
         );
+    }
+
+    async saveOperation(entity: ENTITY): Promise<void> {
+        await this.entityRepository.upsert(entity);
     }
 
     find(id: ID): RepositoryOutput<ID, T> {
@@ -67,17 +71,19 @@ export abstract class RelationalRepository<
 
     delete(id: ID): RepositoryOutput<ID, void> {
         return pipe(
-            this.callOrm([id], () =>
-                this.entityRepository.nativeDelete({
-                    [this.idColumnName]: id,
-                } as FilterQuery<ENTITY>),
-            ),
+            this.callOrm([id], () => this.deleteOperation(id)),
             TE.chain((result) =>
                 result === 1
                     ? TE.right(undefined)
                     : TE.left(RE.entityNotFoundError(id)),
             ),
         );
+    }
+
+    deleteOperation(id: ID): Promise<number> {
+        return this.entityRepository.nativeDelete({
+            [this.idColumnName]: id,
+        } as FilterQuery<ENTITY>);
     }
 
     protected callOrm<A>(

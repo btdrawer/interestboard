@@ -4,7 +4,7 @@ import * as O from "fp-ts/Option";
 import * as NEA from "fp-ts/NonEmptyArray";
 import { pipe } from "fp-ts/function";
 import { RepositoryOutput } from "../../RepositoryOutput";
-import { MikroORM, EntityName } from "@mikro-orm/core";
+import { MikroORM, EntityName, FilterQuery } from "@mikro-orm/core";
 import {
     PaginatedRepository,
     PaginationOptions,
@@ -32,12 +32,28 @@ export abstract class RelationalPaginatedRepository<
     }
 
     list(options: PaginationOptions): RepositoryOutput<ID, T[]> {
-        const filters = O.getOrElse(() => ({}))(
-            O.map(this.getFiltersFromCursor)(options.cursor),
+        return this.listWithFilters({}, options);
+    }
+
+    protected listWithFilters(
+        filters: FilterQuery<ENTITY>,
+        options: PaginationOptions,
+    ): RepositoryOutput<ID, T[]> {
+        const filtersWithPagination = O.getOrElse(() => filters)(
+            pipe(
+                options.cursor,
+                O.map(this.getFiltersFromCursor),
+                O.map((cursorFilters) => ({
+                    ...filters,
+                    ...cursorFilters,
+                })),
+            ),
         );
         return pipe(
             this.callOrm([], () =>
-                this.entityRepository.find(filters, { limit: options.first }),
+                this.entityRepository.find(filtersWithPagination, {
+                    limit: options.first,
+                }),
             ),
             TE.map((entities) => entities.map(this.fromEntity)),
         );

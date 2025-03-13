@@ -3,6 +3,7 @@ import {
     ManyToOne,
     OneToMany,
     PrimaryKey,
+    PrimaryKeyProp,
     Property,
 } from "@mikro-orm/core";
 import * as NEA from "fp-ts/NonEmptyArray";
@@ -16,6 +17,8 @@ export class BoardModerator {
 
     @ManyToOne({ primary: true })
     userId!: U.UserId;
+
+    [PrimaryKeyProp]?: ["boardId", "userId"];
 }
 
 @Entity()

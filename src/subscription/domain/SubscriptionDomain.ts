@@ -12,6 +12,8 @@ import * as RE from "../../common/repository/RepositoryError";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
 import { EventBus } from "../../common/event/EventBus";
 import * as SUE from "../event/SubscriptionUpdatedEvent";
+import { SubscriptionUpdatedEventRepository } from "../event/repository/SubscriptionUpdatedEventRepository";
+import { OutboxHandler } from "../../common/outbox/OutboxHandler";
 
 export const repositoryErrorToSubscriptionError = (
     repositoryError: RE.RepositoryError<S.BoardSubscriptionId>,
@@ -28,14 +30,33 @@ export const repositoryErrorToSubscriptionError = (
 };
 
 export class SubscriptionDomain implements SubscriptionFacade {
+    private outboxHandler: OutboxHandler<
+        S.BoardSubscriptionId,
+        SUE.SubscriptionUpdatedEventBody,
+        SUE.SubscriptionUpdatedEvent
+    >;
+
     constructor(
         private repository: SubscriptionRepository,
+        private subscriptionUpdateEventRepository: SubscriptionUpdatedEventRepository,
         private eventBus: EventBus<
             SUE.SubscriptionUpdatedEventBody,
             SUE.SubscriptionUpdatedEvent
         >,
         private userFacade: UserFacade,
-    ) {}
+    ) {
+        this.outboxHandler = new OutboxHandler<
+            S.BoardSubscriptionId,
+            SUE.SubscriptionUpdatedEventBody,
+            SUE.SubscriptionUpdatedEvent
+        >(
+            this.subscriptionUpdateEventRepository,
+            (event) =>
+                S.getBoardSubscriptionId(event.body.userId, event.body.boardId),
+            repositoryErrorToSubscriptionError,
+        );
+        this.outboxHandler.startHandler(this.eventBus.dispatch);
+    }
 
     subscribe(
         input: SI.SubscribeToBoardInput,
@@ -44,7 +65,7 @@ export class SubscriptionDomain implements SubscriptionFacade {
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
             // TODO handle if already exists - idempotent? but 'created' should not be overwritten
-            TE.bind("subscription", () =>
+            TE.chain(() =>
                 this.callRepository(
                     this.repository.save({
                         id: S.getBoardSubscriptionId(
@@ -57,19 +78,6 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     }),
                 ),
             ),
-            TE.map(({ subscription }) => {
-                this.eventBus.dispatch(
-                    SUE.subscriptionUpdatedEvent(
-                        {
-                            userId: subscription.userId,
-                            boardId: subscription.boardId,
-                            type: SUE.SubscriptionUpdateType.Add,
-                        },
-                        new Date(),
-                    ),
-                );
-                return subscription;
-            }),
         );
     }
 
@@ -110,10 +118,8 @@ export class SubscriptionDomain implements SubscriptionFacade {
         return pipe(
             TE.Do,
             TE.chain(() => this.userFacade.getFromContext(input.context)),
-            TE.bind("subscription", () =>
-                this.callRepository(this.repository.find(input.id)),
-            ),
-            TE.bind("deleteSubscription", () =>
+            TE.chain(() => this.callRepository(this.repository.find(input.id))),
+            TE.chain(() =>
                 this.callRepository(
                     this.repository.delete(
                         S.getBoardSubscriptionId(
@@ -123,19 +129,7 @@ export class SubscriptionDomain implements SubscriptionFacade {
                     ),
                 ),
             ),
-            TE.map(({ subscription }) => {
-                this.eventBus.dispatch(
-                    SUE.subscriptionUpdatedEvent(
-                        {
-                            userId: subscription.userId,
-                            boardId: subscription.boardId,
-                            type: SUE.SubscriptionUpdateType.Delete,
-                        },
-                        new Date(),
-                    ),
-                );
-                return undefined;
-            }),
+            TE.map(() => undefined),
         );
     }
 
