@@ -47,13 +47,24 @@ export class BoardDomain implements BoardFacade {
             SUE.SubscriptionUpdatedEvent
         >,
     ) {
-        this.subscriptionUpdatedEventBus.addListener((event) => {
-            if (event.body.type === SUE.SubscriptionUpdateType.Add) {
-                this.repository.addSubscriber(event.body.boardId)();
-            } else {
-                this.repository.removeSubscriber(event.body.boardId)();
-            }
-        });
+        this.subscriptionUpdatedEventBus.addListener(
+            this.handleSubscriptionUpdatedEvent,
+        );
+    }
+
+    private handleSubscriptionUpdatedEvent(
+        event: SUE.SubscriptionUpdatedEvent,
+    ) {
+        return pipe(
+            event.body.type === SUE.SubscriptionUpdateType.Add
+                ? this.callRepository(
+                      this.repository.addSubscriber(event.body.boardId),
+                  )
+                : this.callRepository(
+                      this.repository.removeSubscriber(event.body.boardId),
+                  ),
+            TE.map(() => undefined),
+        );
     }
 
     create(input: BI.CreateBoardInput): FacadeOutput<B.Board> {

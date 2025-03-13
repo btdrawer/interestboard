@@ -49,9 +49,7 @@ export class ThreadDomain implements ThreadFacade {
         private boardFacade: BoardFacade,
         private voteEventBus: EventBus<VoteEventBody, VoteEvent>,
     ) {
-        this.voteEventBus.addListener((event) => {
-            this.updateVotes(event)();
-        });
+        this.voteEventBus.addListener(this.updateVotes);
     }
 
     private updateVotes(event: VoteEvent) {
@@ -77,6 +75,7 @@ export class ThreadDomain implements ThreadFacade {
                 };
                 return this.callRepository(this.repository.save(updated));
             }),
+            TE.map(() => undefined),
         );
     }
 

@@ -21,4 +21,32 @@ export class VoteEvent {
 
     @Property()
     action!: VE.Action;
+
+    @Property()
+    created!: Date;
 }
+
+export const createVoteEventEntity = (
+    id: V.VoteId,
+    vote: VE.VoteEvent,
+): VoteEvent => {
+    const entity = new VoteEvent();
+    entity.id = id;
+    entity.userId = vote.body.userId;
+    entity.threadId = vote.body.threadId;
+    entity.type = vote.body.type;
+    entity.action = vote.body.action;
+    return entity;
+};
+
+export const fromVoteEntity = (entity: VoteEvent): VE.VoteEvent => {
+    return VE.voteEvent(
+        {
+            userId: entity.userId,
+            threadId: entity.threadId,
+            type: entity.type,
+            action: entity.action,
+        },
+        entity.created,
+    );
+};

@@ -10,3 +10,5 @@ export type VoteRepository = Repository<V.VoteId, V.Vote> & {
         threadId: T.ThreadId,
     ): RepositoryOutput<V.VoteId, V.Vote[]>;
 };
+
+export const getId = (vote: V.Vote): V.VoteId => vote.id;

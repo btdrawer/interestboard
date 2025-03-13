@@ -17,8 +17,10 @@ import {
 import { UserFacade } from "../../user/facade/UserFacade";
 import { EventBus } from "../../common/event/EventBus";
 import { RepositoryOutput } from "../../common/repository/RepositoryOutput";
+import { OutboxHandler } from "../../common/outbox/OutboxHandler";
+import { VoteEventRepository } from "../event/repository/VoteEventRepository";
 
-export const repositoryErrorToSubscriptionError = (
+export const repositoryErrorToVoteError = (
     repositoryError: RE.RepositoryError<V.VoteId>,
 ): VE.VoteError => {
     if (RE.isRepositoryNotFoundError(repositoryError, V.voteId.type)) {
@@ -28,11 +30,26 @@ export const repositoryErrorToSubscriptionError = (
 };
 
 export class VoteDomain implements VoteFacade {
+    private outboxHandler: OutboxHandler<V.VoteId, VoteEventBody, VoteEvent>;
+
     constructor(
         private repository: VoteRepository,
-        private voteEventBus: EventBus<VoteEventBody, VoteEvent>,
+        private voteEventRepository: VoteEventRepository,
+        private eventBus: EventBus<VoteEventBody, VoteEvent>,
         private userFacade: UserFacade,
-    ) {}
+    ) {
+        this.outboxHandler = new OutboxHandler<
+            V.VoteId,
+            VoteEventBody,
+            VoteEvent
+        >(
+            this.voteEventRepository,
+            (event) =>
+                V.generateVoteRecordId(event.body.userId, event.body.threadId),
+            repositoryErrorToVoteError,
+        );
+        this.outboxHandler.startHandler(this.eventBus.dispatch);
+    }
 
     // TODO can vote on non-existent IDs
     vote(input: VI.VoteInput): FacadeOutput<V.Vote> {
@@ -53,20 +70,6 @@ export class VoteDomain implements VoteFacade {
                 };
             }),
             TE.chain((vote) => this.callRepository(this.repository.save(vote))),
-            TE.map((vote) => {
-                this.voteEventBus.dispatch(
-                    voteEvent(
-                        {
-                            userId: vote.userId,
-                            threadId: vote.threadId,
-                            type: vote.type,
-                            action: Action.Vote,
-                        },
-                        new Date(),
-                    ),
-                );
-                return vote;
-            }),
         );
     }
 
@@ -99,27 +102,13 @@ export class VoteDomain implements VoteFacade {
             TE.bind("vote", ({ id }) =>
                 this.callRepository(this.repository.find(id)),
             ),
-            TE.bind("deleteVote", ({ id }) =>
+            TE.chain(({ id }) =>
                 this.callRepository(this.repository.delete(id)),
             ),
-            TE.map(({ vote }) => {
-                this.voteEventBus.dispatch(
-                    voteEvent(
-                        {
-                            userId: input.context.userId,
-                            threadId: input.threadId,
-                            type: vote.type,
-                            action: Action.Unvote,
-                        },
-                        new Date(),
-                    ),
-                );
-                return undefined;
-            }),
         );
     }
 
     private callRepository<T>(output: RepositoryOutput<V.VoteId, T>) {
-        return pipe(output, TE.mapLeft(repositoryErrorToSubscriptionError));
+        return pipe(output, TE.mapLeft(repositoryErrorToVoteError));
     }
 }
